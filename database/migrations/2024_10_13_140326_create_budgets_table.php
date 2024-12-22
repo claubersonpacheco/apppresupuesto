@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->string('name');
-            $table->string('code');
+            $table->string('code')->unique();
             $table->string('description')->nullable();
 
             $table->decimal('total', 10, 2)->default(0);

@@ -54,6 +54,7 @@ class ItemsBudget extends Page
         ];
     }
 
+    //Header information of client
     public function headertInfolist(Infolist $infolist): Infolist
     {
 
@@ -69,6 +70,10 @@ class ItemsBudget extends Page
                     ->schema([
                         Fieldset::make('Cliente')
                             ->schema([
+                                TextEntry::make('code')
+                                    ->inlineLabel()
+                                    ->label('Codigo del Cliente:')
+                                    ->columnSpan(2),
                                 TextEntry::make('created_at')
                                     ->inlineLabel()
                                     ->label('Fecha Presupuesto:')
@@ -98,7 +103,7 @@ class ItemsBudget extends Page
             ]);
     }
 
-
+    //Footer total information and observation
     #[On('refreshInfolist')]
     public function productInfolist(Infolist $infolist): Infolist
     {

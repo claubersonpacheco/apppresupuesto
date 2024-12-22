@@ -32,18 +32,27 @@ class CustomerResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('code')
+                    ->required()
+                    ->disabled()
+                    ->maxLength(50),
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpan(2),
                 Forms\Components\TextInput::make('email')
+                    ->label('Correo Eletronico')
                     ->required()
                     ->email()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
+                    ->label('Telefono')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('document'),
+                Forms\Components\TextInput::make('document')
+                ->label('Documentación'),
                 Forms\Components\TextInput::make('address')
+                    ->label('Direccion')
                     ->required()
                     ->maxLength(255),
             ]);

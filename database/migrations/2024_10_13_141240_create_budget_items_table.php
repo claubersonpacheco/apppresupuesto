@@ -16,6 +16,7 @@ return new class extends Migration
 
             $table->foreignId('budget_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->text('description')->nullable();
             $table->integer('quantity');
             $table->decimal('price', 10, 2)->default(0);
             $table->string('tax', 2)->default(0);

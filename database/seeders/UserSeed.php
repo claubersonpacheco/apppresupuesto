@@ -14,6 +14,7 @@ class UserSeed extends Seeder
     public function run(): void
     {
         User::create([
+            'code' => 'FS24US0001',
             'name' => 'Webmaster',
             'email' => 'caubinho@gmail.com',
             'password' => bcrypt('cau12345'),

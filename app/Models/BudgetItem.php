@@ -10,7 +10,7 @@ class BudgetItem extends Model
 {
     use HasFactory;
 
-    protected $guarded;
+    protected $fillable = ['budget_id', 'product_id', 'quantity', 'price', 'tax', 'description', 'total', 'total_tax'];
 
     public function budget():BelongsTo
     {
@@ -21,4 +21,12 @@ class BudgetItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function printMarks()
+    {
+        return $this->hasMany(BudgetItemToPrint::class);
+    }
+
+
+
 }

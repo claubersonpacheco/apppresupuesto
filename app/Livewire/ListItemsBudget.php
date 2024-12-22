@@ -13,6 +13,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -31,9 +32,12 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Filament\Infolists\Contracts\HasInfolists;
+
+
 
 class ListItemsBudget extends Component implements HasTable, HasForms, HasInfolists
 {
@@ -71,6 +75,15 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
         }
     }
 
+    public array $visibleColumns = [
+        'product.name' => true,
+        'description' => true,
+        'tax' => false,
+        'total' => true,
+        'total_tax' => false,
+    ];
+
+
     // aqui busco los datos para inserir en la tabla
     public function table(Table $table): Table
     {
@@ -79,13 +92,15 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
             ->query(BudgetItem::query())
             ->columns([
                 TextColumn::make('product.name')->label(__('Servicio')),
-                TextColumn::make('product.description')->label(__('Descripción'))
+                TextColumn::make('description')->label(__('Descripción'))
                     ->html() // Permite renderizar HTML na coluna
                     ->wrap(),
                 TextColumn::make('tax')->label('Iva %')
-                ->toggleable(isToggledHiddenByDefault: true),
+                ->toggleable(isToggledHiddenByDefault: true)
+                    ->hidden(fn() => !$this->visibleColumns['tax']),
                 TextColumn::make('total')->label('Valor s/Iva')
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->hidden(fn() => !$this->visibleColumns['total']),
                 TextColumn::make('total_tax')->label('Valor c/Iva')
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -108,7 +123,14 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->options(Product::all()->pluck('name', 'id'))
                                     ->required()
                                     ->reactive()
-                                    ->afterStateUpdated(fn(callable $set, $state) => $set('price', Product::find($state)->price))
+                                    ->afterStateUpdated(function (callable $set, $state) {
+                                        $product = Product::find($state);
+                                        if ($product) {
+                                            $set('price', $product->price ?? 0);
+                                            $set('description', $product->description ?? ''); // Define a descrição inicial
+                                        }
+                                    })
+
                                     ->columns(1),
 
 
@@ -155,12 +177,18 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         '21' => '21%',
                                     ])
                                     ->reactive()
+                                    ->default('0')
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
                                         $total = $get('total');
                                         $tax = (int) $state / 100;
                                         $set('total_tax', $total + ($total * $tax));
                                     })
                                     ->columns(1),
+
+                                RichEditor::make('description')
+                                    ->label('Descripción del servicio')
+                                    ->reactive()
+                                ->columnSpan(4),
 
 
                                 TextInput::make('total')
@@ -287,6 +315,35 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
             ]);
     }
 
+
+    public function toggleColumnVisibility(string $columnKey)
+    {
+        $this->visibleColumns[$columnKey] = !$this->visibleColumns[$columnKey];
+    }
+
+    // Método para gerar PDF
+    public function generatePDF()
+    {
+        // Filtrar colunas visíveis
+        $columnsToPrint = array_keys(array_filter($this->visibleColumns));
+
+        // Obter os itens com as colunas visíveis
+        $items = BudgetItem::all()->map(function ($item) use ($columnsToPrint) {
+            return $item->only($columnsToPrint);
+        });
+
+        // Geração do PDF (ajuste o caminho da view e os dados conforme necessário)
+        $pdf = Pdf::loadView('pdf.budget_items', [
+            'items' => $items,
+            'columnsToPrint' => $columnsToPrint,
+        ]);
+
+        // Retornar o download ou exibir no navegador
+        return response()->streamDownload(
+            fn() => print($pdf->stream()),
+            'budget_items.pdf'
+        );
+    }
 
 
     public function render(): View

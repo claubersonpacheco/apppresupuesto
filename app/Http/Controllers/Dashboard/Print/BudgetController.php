@@ -16,4 +16,9 @@ class BudgetController extends Controller
         ]);
 
     }
+
+    public function sendEmail($id)
+    {
+
+    }
 }
