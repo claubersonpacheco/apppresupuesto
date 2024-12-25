@@ -84,7 +84,7 @@ class BudgetResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('manage_items')
-                    ->label('Gerenciar Itens')
+                    ->label('Servicios')
                     ->url(fn (Budget $record): string => self::getUrl('items', ['record' => $record]))
                     ->icon('heroicon-o-cog'), // Adicione um ícone apropriado
                 Tables\Actions\EditAction::make(),

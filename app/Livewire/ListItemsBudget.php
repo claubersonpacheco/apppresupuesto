@@ -6,36 +6,36 @@ use App\Enum\ProductType;
 use App\Models\Budget;
 use App\Models\BudgetItem;
 
-use App\Models\Category;
 use App\Models\Product;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Infolists\Components\Fieldset;
+use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Infolist;
+use Filament\Pages\Actions\ButtonAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\Url;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Filament\Infolists\Contracts\HasInfolists;
+use Filament\Tables\Columns\Concerns\CanBeToggled;
+
 
 
 
@@ -44,19 +44,101 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     use InteractsWithTable;
     use InteractsWithForms;
     use InteractsWithInfolists;
+    use CanBeToggled;
 
     public $budgetId;
 
-    public $budget;
+    public Budget $budget;
 
-    //utilizo un evento para actualizar el database
-    protected $listeners = ['refreshInfolist' => '$refresh'];
+    public $visibleColumns = [];
+    public $tax = false;
+    public $total = true;
+    public $total_tax = false;
+
+
 
     public function mount($record)
     {
         $this->budgetId = $record->id;
+
+        $budget = Budget::query()->findOrFail($record->id);
+
+        $this->budget = $budget;
+
+        if($budget){
+
+            $this->tax = (bool) $budget->show_tax;
+            $this->total = (bool) $budget->show_total;
+            $this->total_tax = (bool) $budget->show_total_tax;
+
+            logger('Valores iniciais:', [
+                'tax' => $this->tax,
+                'total' => $this->total,
+                'total_tax' => $this->total_tax,
+            ]);
+
+        }
+
+        $this->visibleColumns = [
+            'tax' => $this->tax,
+            'total' => $this->total,
+            'total_tax' => $this->total_tax,
+        ];
+
+
+
     }
 
+
+
+    //-----header infolist
+    public function headertInfolist(Infolist $infolist): Infolist
+    {
+
+        return $infolist
+            ->record($this->budget->customer) // Verifique se $this->budget está corretamente inicializado
+            ->schema([
+                \Filament\Infolists\Components\Grid::make(3)
+                    ->columnSpan([
+                        'default' => 1,
+                        'lg' => 1, // Define o span para cada coluna no layout maior
+                    ])
+                    // Cria um layout de grid com 3 colunas
+                    ->schema([
+                        Fieldset::make('Cliente')
+                            ->schema([
+                                TextEntry::make('code')
+                                    ->inlineLabel()
+                                    ->label('Codigo del Cliente:')
+                                    ->columnSpan(2),
+                                TextEntry::make('created_at')
+                                    ->inlineLabel()
+                                    ->label('Fecha Presupuesto:')
+                                    ->columnSpan(2)
+                                    ->date('d/m/y'),
+                                TextEntry::make('name')
+                                    ->label('Nombre:')
+                                    ->inlineLabel()
+                                    ->alignLeft()
+                                ,
+
+                                TextEntry::make('email')
+                                    ->label('E-mail:')
+                                    ->inlineLabel(),
+                                TextEntry::make('phone')
+                                    ->label('Teléfono:')
+                                    ->inlineLabel(),
+                                TextEntry::make('address')
+                                    ->label('Direccion:')
+                                    ->inlineLabel(),
+
+                            ])
+                            ->extraAttributes(['class' => 'bg-white p-4 dark:bg-gray-900 dark:text-white']) // Adiciona fundo branco
+                            ->columnSpan(2),
+                    ])
+                ,
+            ]);
+    }
 
     public function updateBudgetTotal()
     {
@@ -75,40 +157,64 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
         }
     }
 
-    public array $visibleColumns = [
-        'product.name' => true,
-        'description' => true,
-        'tax' => false,
-        'total' => true,
-        'total_tax' => false,
-    ];
+    public function updateVisibleColumns()
+    {
+        $this->visibleColumns = [
+            'tax' => $this->tax,
+            'total' => $this->total,
+            'total_tax' => $this->total_tax,
+        ];
 
+        $budget = Budget::find($this->budgetId);
+
+
+        if ($budget) {
+            $budget->update([
+                'show_tax' =>  $this->tax,
+                'show_total' => $this->total,
+                'show_total_tax' =>  $this->total_tax,
+            ]);
+        }
+    }
+
+    public function toggleColumnVisibility(string $column)
+    {
+        $this->visibleColumns[$column] = !$this->visibleColumns[$column];
+
+        // Atualiza a tabela e o Infolist
+        $this->dispatch('refreshInfolist');
+    }
 
     // aqui busco los datos para inserir en la tabla
     public function table(Table $table): Table
     {
 
         return $table
-            ->query(BudgetItem::query())
+            ->query(BudgetItem::query()->where('budget_id', $this->budgetId ))
             ->columns([
                 TextColumn::make('product.name')->label(__('Servicio')),
                 TextColumn::make('description')->label(__('Descripción'))
                     ->html() // Permite renderizar HTML na coluna
                     ->wrap(),
+
                 TextColumn::make('tax')->label('Iva %')
-                ->toggleable(isToggledHiddenByDefault: true)
+
                     ->hidden(fn() => !$this->visibleColumns['tax']),
+
                 TextColumn::make('total')->label('Valor s/Iva')
-                    ->toggleable(isToggledHiddenByDefault: false)
+
                     ->hidden(fn() => !$this->visibleColumns['total']),
+
                 TextColumn::make('total_tax')->label('Valor c/Iva')
-                    ->toggleable(isToggledHiddenByDefault: true),
+
+                    ->hidden(fn() => !$this->visibleColumns['total_tax']),
 
             ])
             ->filters([
                 //
             ])
             ->headerActions([
+
                 CreateAction::make()
                     ->model(BudgetItem::class)
                     ->form([
@@ -210,7 +316,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
 
                     })
-                    ->label('Add Items'),
+                    ->label('Add Servicios'),
             ])
             ->actions([
                 EditAction::make()
@@ -316,35 +422,51 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     }
 
 
-    public function toggleColumnVisibility(string $columnKey)
+
+    #[On('refreshInfolist')]
+    public function productInfolist(Infolist $infolist): Infolist
     {
-        $this->visibleColumns[$columnKey] = !$this->visibleColumns[$columnKey];
+
+        return $infolist
+            ->record($this->budget->refresh())
+            ->schema([
+                \Filament\Infolists\Components\Grid::make(3)
+                    ->columnSpan([
+                        'default' => 1,
+                        'lg' => 1, // Define o span para cada coluna no layout maior
+                    ])// Cria um layout de grid com 3 colunas
+                    ->schema([
+
+                        Section::make()
+                            ->schema([
+                                TextEntry::make('description')
+                                    ->markdown()
+                                    ->label('Observación')
+                            ])->columnSpan(1),
+
+                        Section::make()
+                            ->schema([
+                                TextEntry::make('tax')
+                                    ->label('Total IVA')
+                                    ->hidden(fn() => !$this->visibleColumns['total_tax']),
+
+                            ])->columnSpan(1),
+
+                        Section::make()
+                            ->schema([
+                                TextEntry::make('total')
+                                    ->label('Total Sin IVA')
+                                    ->hidden(fn() => !$this->visibleColumns['total']),
+
+                                TextEntry::make('total_tax')
+                                    ->label('Total c/ IVA')
+                                    ->hidden(fn() => !$this->visibleColumns['total_tax']),
+                            ])->columnSpan(1),
+
+                    ])
+                ,
+            ]);
     }
-
-    // Método para gerar PDF
-    public function generatePDF()
-    {
-        // Filtrar colunas visíveis
-        $columnsToPrint = array_keys(array_filter($this->visibleColumns));
-
-        // Obter os itens com as colunas visíveis
-        $items = BudgetItem::all()->map(function ($item) use ($columnsToPrint) {
-            return $item->only($columnsToPrint);
-        });
-
-        // Geração do PDF (ajuste o caminho da view e os dados conforme necessário)
-        $pdf = Pdf::loadView('pdf.budget_items', [
-            'items' => $items,
-            'columnsToPrint' => $columnsToPrint,
-        ]);
-
-        // Retornar o download ou exibir no navegador
-        return response()->streamDownload(
-            fn() => print($pdf->stream()),
-            'budget_items.pdf'
-        );
-    }
-
 
     public function render(): View
     {
