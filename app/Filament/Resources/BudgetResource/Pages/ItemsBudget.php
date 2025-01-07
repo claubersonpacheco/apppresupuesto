@@ -29,10 +29,16 @@ class ItemsBudget extends Page
        protected function getHeaderActions(): array
     {
         return [
+
             Action::make('Imprimir')
-            ->url(route('budget.print', $this->record))
+                ->url(route('budget.print', $this->record))
                 ->icon('heroicon-o-printer')
-            ->color('warning'),
+                ->color('warning')
+                ->openUrlInNewTab(),
+            Action::make('Generar PDF')
+            ->url(route('budget.pdf', $this->record))
+                ->icon('heroicon-o-printer')
+                ->color('success'),
             Action::make('Voltar')
                 ->url('/dashboard/budgets')
                 ->icon('heroicon-o-arrow-uturn-left'),

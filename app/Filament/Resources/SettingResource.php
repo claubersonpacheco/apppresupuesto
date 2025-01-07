@@ -40,7 +40,20 @@ class SettingResource extends Resource
                     ->directory('logo')
                     ->image()
                     ->imageEditor(),
+                Forms\Components\TextInput::make('address')
+                    ->maxLength(100),
+                Forms\Components\TextInput::make('city')
+                    ->maxLength(100),
+                Forms\Components\TextInput::make('postal_code')
+                    ->maxLength(10),
+
+                Forms\Components\TextInput::make('email')
+                    ->label('Email contacto')
+                    ->email()
+                    ->maxLength(255),
+
                 Forms\Components\TextInput::make('send_email')
+                    ->label('Email config')
                     ->email()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('whatsapp')

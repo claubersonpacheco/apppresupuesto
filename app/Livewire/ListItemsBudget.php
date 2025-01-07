@@ -7,14 +7,18 @@ use App\Models\Budget;
 use App\Models\BudgetItem;
 
 use App\Models\Product;
+use App\Models\StatusHistory;
+use App\Models\User;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -39,6 +43,9 @@ use Filament\Tables\Columns\Concerns\CanBeToggled;
 
 
 
+
+
+
 class ListItemsBudget extends Component implements HasTable, HasForms, HasInfolists
 {
     use InteractsWithTable;
@@ -54,8 +61,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     public $tax = false;
     public $total = true;
     public $total_tax = false;
-
-
 
     public function mount($record)
     {
@@ -89,8 +94,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
     }
 
-
-
     //-----header infolist
     public function headertInfolist(Infolist $infolist): Infolist
     {
@@ -98,23 +101,17 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
         return $infolist
             ->record($this->budget->customer) // Verifique se $this->budget está corretamente inicializado
             ->schema([
-                \Filament\Infolists\Components\Grid::make(3)
-                    ->columnSpan([
-                        'default' => 1,
-                        'lg' => 1, // Define o span para cada coluna no layout maior
-                    ])
-                    // Cria um layout de grid com 3 colunas
-                    ->schema([
+
                         Fieldset::make('Cliente')
                             ->schema([
                                 TextEntry::make('code')
                                     ->inlineLabel()
                                     ->label('Codigo del Cliente:')
-                                    ->columnSpan(2),
+                                   ,
                                 TextEntry::make('created_at')
                                     ->inlineLabel()
                                     ->label('Fecha Presupuesto:')
-                                    ->columnSpan(2)
+
                                     ->date('d/m/y'),
                                 TextEntry::make('name')
                                     ->label('Nombre:')
@@ -131,13 +128,115 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 TextEntry::make('address')
                                     ->label('Direccion:')
                                     ->inlineLabel(),
+                            ])
+                            ->extraAttributes(['class' => 'bg-white p-4 dark:bg-gray-900 dark:text-white']),
+            ]);
+    }
+
+    private function getStatusColor($status)
+    {
+        // Aqui você define as cores com base no status
+        switch ($status) {
+            case 'STATUS_OPEN':
+                return 'primary-500';   // Azul para "Aberto"
+            case 'STATUS_SENT':
+                return 'yellow-500'; // Amarelo para "Enviado"
+            case 'STATUS_PENDING':
+                return 'orange-500'; // Laranja para "Pendiente"
+            case 'STATUS_REJECTED':
+                return 'red-500';    // Vermelho para "Rechazado"
+            case 'STATUS_APPROVED':
+                return 'green-500';  // Verde para "Aprovado"
+            case 'STATUS_IN_PROCESS':
+                return 'purple-500'; // Roxo para "Em processo"
+            case 'STATUS_COMPLETED':
+                return 'gray-500';   // Cinza para "Finalizado"
+            default:
+                return 'gray-300';   // Cor padrão para status desconhecido
+        }
+    }
+
+    public function statusInfolist(Infolist $infolist): Infolist
+    {
+
+        $budget = new Budget();
+
+        return $infolist
+            ->record($this->budget->latestStatus()->first() ?? new StatusHistory())
+                    // Cria um layout de grid com 3 colunas
+                    ->schema([
+                        Fieldset::make('Status')
+                            ->schema([
+                                TextEntry::make('status')
+                                    ->inlineLabel()
+                                    ->label('Status')
+                                    ->columnSpan(1)
+                                    ->getStateUsing(function ($record) {
+                                        $statusOptions = StatusHistory::getStatusOptions();
+                                        return $statusOptions[$record->status] ?? 'Status desconhecido';
+                                    })
+
+                                    ->suffixAction(
+                                        Action::make('alterarStatus')
+                                            ->form([
+                                                Select::make('status_id')
+                                                    ->label('Novo Status')
+                                                    ->options(StatusHistory::getStatusOptions())
+                                                    ->required(),
+                                                Textarea::make('comments')
+                                                    ->label('Comentários')
+                                                    ->placeholder('Adicione seus comentários...')
+                                                    ->required(),
+                                            ])
+                                            ->icon('heroicon-m-pencil-square')
+                                            ->action(function (array $data) { // Passa o modelo Budget explicitamente
+
+                                                $idBudget = $this->budgetId;
+
+                                                // Encontre o Budget pelo ID
+                                                $budget = Budget::find($idBudget);
+
+                                                // Verifique se o orçamento foi encontrado
+                                                if ($budget) {
+                                                    // Crie o status history com os dados fornecidos
+                                                    $budget->statusHistories()->create([
+                                                        'status' => $data['status_id'],
+                                                        'comments' => $data['comments'],
+                                                        'changed_by' => auth()->id(),
+                                                        'budget_id' => $idBudget, // Vincula ao orçamento
+                                                    ]);
+                                                } else {
+                                                    dd('Budget não encontrado');
+                                                }
+                                            })
+                                            ->modalHeading('Alterar Status')
+                                            ->modalWidth('md'),
+                                    )
+                                    ->extraAttributes(function ($record) {
+
+                                        $status = $record->status ?? 'STATUS_UNKNOWN';
+                                        $statusColor = $this->getStatusColor($status);
+                                        return [
+                                            'class' => "bg-{$statusColor} text-white p-2",
+                                        ];
+                                    })
+
+                                    ->columnSpan(1),
+
+                                TextEntry::make('created_at')
+                                    ->inlineLabel()
+                                    ->label('Fecha:')
+
+                                    ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->format('d/m/y - H:i:s')),
+                                TextEntry::make('comments')
+                                    ->inlineLabel()
+                                    ->label('Comentarios:'),
 
                             ])
-                            ->extraAttributes(['class' => 'bg-white p-4 dark:bg-gray-900 dark:text-white']) // Adiciona fundo branco
-                            ->columnSpan(2),
-                    ])
-                ,
-            ]);
+                            ->extraAttributes(['class' => 'bg-white p-4 dark:bg-gray-900 dark:text-white']),
+
+
+                    ]);
     }
 
     public function updateBudgetTotal()
@@ -190,7 +289,11 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     {
 
         return $table
-            ->query(BudgetItem::query()->where('budget_id', $this->budgetId ))
+            ->query(
+                BudgetItem::query()
+                    ->where('budget_id', $this->budgetId)
+                    ->orderBy('sort_order') // Ordena pela coluna `sort_order`
+            )
             ->columns([
                 TextColumn::make('product.name')->label(__('Servicio')),
                 TextColumn::make('description')->label(__('Descripción'))
@@ -210,6 +313,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                     ->hidden(fn() => !$this->visibleColumns['total_tax']),
 
             ])
+            ->reorderable('sort_order') // Ativa o recurso de arrastar e soltar
             ->filters([
                 //
             ])
@@ -238,7 +342,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     })
 
                                     ->columns(1),
-
 
                                 TextInput::make('quantity')
                                     ->label('Quantidade')
@@ -272,7 +375,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         $set('total_tax', $total + ($total * $tax));
                                     }),
 
-
                                 Select::make('tax')
                                     ->label('IVA')
                                     ->options([
@@ -296,7 +398,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->reactive()
                                 ->columnSpan(4),
 
-
                                 TextInput::make('total')
                                     ->label('Total s/Iva')
                                     ->disabled()
@@ -306,17 +407,13 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->label('Total c/Iva')
                                     ->disabled()
                                     ->required(),
-
-
                             ])
                     ])
                     ->after(function () {
                         $this->updateBudgetTotal(); // Recalcula o total após criar o item
                         $this->dispatch('refreshInfolist');
-
-
                     })
-                    ->label('Add Servicios'),
+                    ->label('Agregar Servícios'),
             ])
             ->actions([
                 EditAction::make()
@@ -386,7 +483,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         $set('total_tax', $total + ($total * $tax));
                                     })
                                     ->columns(1),
-
+                                RichEditor::make('description')
+                                    ->label('Descripción del servicio')
+                                    ->reactive()
+                                    ->columnSpan(4),
 
                                 TextInput::make('total')
                                     ->label('Total s/Iva')
@@ -397,8 +497,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->label('Total c/Iva')
                                     ->disabled()
                                     ->required(),
-
-
                             ])
 
                     ])
@@ -472,5 +570,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     {
         return view('livewire.list-items-budget');
     }
+
+
 
 }

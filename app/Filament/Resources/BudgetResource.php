@@ -73,6 +73,21 @@ class BudgetResource extends Resource
                     ->label('Valor')
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('latestStatus.status_label')
+                    ->label('Status')
+                    ->sortable()
+                    ->color(fn ($state, $record) => match ($record->latestStatus?->status) {
+                        1 => 'primary',    // Aberto
+                        5 => 'success',    // Aprovado
+                        3 => 'warning',    // Pendiente
+                        4 => 'danger',     // Rechazado
+                        6 => 'secondary',  // En proceso
+                        7 => 'gray',       // Finalizado
+                        2 => 'info',       // Enviado
+                        default => 'gray', // Cor padrão caso não corresponda a nenhum status
+                    })
+                    ->formatStateUsing(fn ($state, $record) => $record->latestStatus?->status_label ?? 'Unknown'),
+
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

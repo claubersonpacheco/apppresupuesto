@@ -7,4 +7,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard/budget/{id}/print', [BudgetController::class, 'printItemsBudget'] )->name('budget.print');
+Route::get('/dashboard/budget/{id}/print', [BudgetController::class, 'print'] )->name('budget.print');
+Route::get('/dashboard/budget/{id}/generate-pdf', [BudgetController::class, 'generatePDF'] )->name('budget.pdf');

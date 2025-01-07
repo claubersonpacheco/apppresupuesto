@@ -14,6 +14,11 @@ class Budget extends Model
     protected $guarded;
 
 
+    public function statusHistories()
+    {
+        return $this->hasMany(StatusHistory::class);
+    }
+
     public function user():BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -32,5 +37,21 @@ class Budget extends Model
     public function items(): HasMany
     {
         return $this->hasMany(BudgetItem::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($budget) {
+            \App\Models\StatusHistory::create([
+                'budget_id' => $budget->id,
+                'status' => \App\Models\StatusHistory::STATUS_OPEN, // Aberto
+                'changed_by' => auth()->id(),
+            ]);
+        });
+    }
+
+    public function latestStatus()
+    {
+        return $this->hasOne(StatusHistory::class)->latestOfMany();
     }
 }

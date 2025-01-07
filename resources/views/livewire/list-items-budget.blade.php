@@ -1,7 +1,19 @@
-<div>
-    {{ $this->headertInfolist }}
+<div class="w-full">
 
-        <fieldset class="dark:border-gray-900 dark:bg-gray-900 p-4 rounded-lg mt-6 border bg-white">
+    <div class="md:flex md:flex-row gap-4">
+        <div class="md:w-1/3 ">
+            <!-- Conteúdo do Infolist 1 -->
+            {{ $this->headertInfolist }}
+        </div>
+        <div class="md:w-2/3 text-end">
+            <!-- Conteúdo do Infolist 2 -->
+            {{ $this->statusInfolist }}
+
+        </div>
+    </div>
+
+
+    <fieldset class="dark:border-gray-900 dark:bg-gray-900 p-4 rounded-lg mt-6 border bg-white">
             <legend class="text-lg font-semibold text-gray-800 dark:text-white">Tipo de presupuesto:</legend>
 
             <div class="flex gap-x-4"> <!-- Ajuste de gap-x para o espaçamento entre os itens -->

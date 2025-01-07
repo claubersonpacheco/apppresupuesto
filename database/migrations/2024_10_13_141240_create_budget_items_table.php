@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('budget_items', function (Blueprint $table) {
             $table->id();
 
+            $table->integer('sort_order')->default(0);
             $table->foreignId('budget_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->text('description')->nullable();
