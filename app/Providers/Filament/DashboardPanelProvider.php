@@ -18,18 +18,40 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+use Filament\Facades\Filament;
+use App\Models\Setting;
+
 class DashboardPanelProvider extends PanelProvider
 {
+
     public function panel(Panel $panel): Panel
     {
+        // Obtém o logo dinâmico da tabela Settings
+        $setting = Setting::first();
+
+        // Verifica se o logo existe
+        $logo = null;
+        if ($setting && $setting->logo) {
+            $path = storage_path('app/public/' . $setting->logo);
+
+            if (file_exists($path)) {
+                $base64 = base64_encode(file_get_contents($path));
+                $logo = 'data:image/png;base64,' . $base64;
+            }
+        }
+
+
         return $panel
             ->default()
             ->id('dashboard')
             ->path('dashboard')
             ->login()
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => Color::hex('#014bde'),
             ])
+            ->brandLogo($logo)
+            ->font('Nunito')
+            ->viteTheme('resources/css/filament/dashboard/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -54,4 +76,6 @@ class DashboardPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
+
 }
