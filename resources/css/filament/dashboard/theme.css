@@ -83,3 +83,52 @@ theme: {
 .fi-btn {
     @apply ring-transparent shadow-gray-400 dark:shadow-gray-950;
 }
+
+/* Azul para "Aberto" */
+.status-open {
+    background-color: #3b82f6; /* Azul Tailwind */
+    color: white;
+}
+
+/* Amarelo para "Enviado" */
+.status-sent {
+    background-color: #fbbf24; /* Amarelo Tailwind */
+    color: white;
+}
+
+/* Laranja para "Pendiente" */
+.status-pending {
+    background-color: #fb923c; /* Laranja Tailwind */
+    color: white;
+}
+
+/* Vermelho para "Rechazado" */
+.status-rejected {
+    background-color: #ef4444; /* Vermelho Tailwind */
+    color: white;
+}
+
+/* Verde para "Aprovado" */
+.status-approved {
+    background-color: #10b981; /* Verde Tailwind */
+    color: white;
+}
+
+/* Roxo para "Em processo" */
+.status-in-process {
+    background-color: #8b5cf6; /* Roxo Tailwind */
+    color: white;
+}
+
+/* Cinza para "Finalizado" */
+.status-completed {
+    background-color: #6b7280; /* Cinza Tailwind */
+    color: white;
+}
+
+/* Cor padrão para casos desconhecidos */
+.status-default {
+    background-color: #6b7280; /* Cinza Tailwind */
+    color: white;
+}
+

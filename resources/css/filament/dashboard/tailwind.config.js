@@ -18,6 +18,7 @@ export default {
             '3xl': '1.9rem',
             '4xl': '2.4rem',
             '5xl': '3.0rem',
-        }
+        },
+
     }
 }

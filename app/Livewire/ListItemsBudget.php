@@ -20,6 +20,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 
 use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\ColorEntry;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -43,7 +44,10 @@ use Livewire\Component;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Tables\Columns\Concerns\CanBeToggled;
 
-use Filament\Infolists\Components\RepeatableEntry;
+use Illuminate\Support\Facades\Log;
+
+
+
 
 class ListItemsBudget extends Component implements HasTable, HasForms, HasInfolists
 {
@@ -54,173 +58,44 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
     public $budgetId;
 
-    public Budget $budget;
+    public $budget;
 
     public $visibleColumns = [];
-    public $tax = false;
-    public $total = true;
-    public $total_tax = false;
+
+    public $service, $qtd, $price, $description , $tax , $total ,$total_tax;
 
     public function mount($record)
     {
         $this->budgetId = $record->id;
 
-        $budget = Budget::query()->findOrFail($record->id);
+
+        $this->budget = Budget::query()->findOrFail($record->id);
 
 
-
-        $this->budget = $budget;
-
-        if ($budget) {
-
-            $this->tax = (bool)$budget->show_tax;
-            $this->total = (bool)$budget->show_total;
-            $this->total_tax = (bool)$budget->show_total_tax;
-
-            logger('Valores iniciais:', [
-                'tax' => $this->tax,
-                'total' => $this->total,
-                'total_tax' => $this->total_tax,
-            ]);
+        if ($this->budget) {
+            $this->service = (bool)$this->budget->show_service;
+            $this->qtd = (bool)$this->budget->show_qtd;
+            $this->price = (bool)$this->budget->show_price;
+            $this->description = (bool)$this->budget->show_description;
+            $this->tax = (bool)$this->budget->show_tax;
+            $this->total = (bool)$this->budget->show_total;
+            $this->total_tax = (bool)$this->budget->show_total_tax;
 
         }
 
         $this->visibleColumns = [
+            'service' => $this->service,
+            'description' => $this->description,
+            'qtd' => $this->qtd,
+            'price' => $this->price,
             'tax' => $this->tax,
             'total' => $this->total,
             'total_tax' => $this->total_tax,
         ];
 
-
     }
 
-    //-----header infolist
-//    public function headertInfolist(Infolist $infolist): Infolist
-//    {
-//
-//        return $infolist
-//            ->record($this->budget->customer)
-//            ->schema([
-//                Fieldset::make('Cliente')
-//                    ->schema([
-//                        TextEntry::make('code')
-//                            ->inlineLabel()
-//                            ->label('Codigo del Cliente:')
-//                            ->extraAttributes(['class' => 'border']),
-//                        TextEntry::make('created_at')
-//                            ->inlineLabel()
-//                            ->extraAttributes(['class' => 'border'])
-//                            ->label('Fecha Presupuesto:')
-//                            ->date('d/m/y'),
-//                        TextEntry::make('name')
-//                            ->label('Nombre:')
-//                            ->extraAttributes(['class' => 'border'])
-//                            ->inlineLabel(),
-//
-//                        TextEntry::make('email')
-//                            ->label('E-mail:')
-//                            ->extraAttributes(['class' => 'border'])
-//                            ->inlineLabel(),
-//                        TextEntry::make('phone')
-//                            ->label('Teléfono:')
-//                            ->extraAttributes(['class' => 'border'])
-//                            ->inlineLabel(),
-//                        TextEntry::make('address')
-//                            ->label('Direccion:')
-//                            ->extraAttributes(['class' => 'border'])
-//                            ->inlineLabel(),
-//                    ])
-//                    ->extraAttributes(['class' => 'bg-white p-4 dark:bg-gray-900 dark:text-white']),
-//            ]);
-//    }
-//
-//    public function statusInfolist(Infolist $infolist): Infolist
-//    {
-//
-//        return $infolist
-//            ->record($this->budget->latestStatus()->first() ?? new StatusHistory())
-//            ->schema([
-//                \Filament\Infolists\Components\Grid::make(2)
-//                    ->columnSpan([
-//                        'default' => 1,
-//                        'lg' => 1, // Define o span para cada coluna no layout maior
-//                    ])
-//                    ->schema([
-//                        Fieldset::make('Status')
-//                            ->schema([
-//                                TextEntry::make('status')
-//                                    ->label('Status')
-//                                    ->extraAttributes(['class' => 'border'])
-//                                    ->getStateUsing(function ($record) {
-//                                        $statusOptions = StatusHistory::getStatusOptions();
-//                                        return $statusOptions[$record->status] ?? 'Status desconhecido';
-//                                    })
-//                                    ->suffixAction(
-//                                        Action::make('alterarStatus')
-//                                            ->form([
-//                                                Select::make('status_id')
-//                                                    ->label('Novo Status')
-//                                                    ->options(StatusHistory::getStatusOptions())
-//                                                    ->required(),
-//                                                Textarea::make('comments')
-//                                                    ->label('Comentários')
-//                                                    ->placeholder('Adicione seus comentários...')
-//                                                    ->required(),
-//                                            ])
-//                                            ->icon('heroicon-m-pencil-square')
-//                                            ->action(function (array $data) { // Passa o modelo Budget explicitamente
-//
-//                                                $idBudget = $this->budgetId;
-//
-//                                                // Encontre o Budget pelo ID
-//                                                $budget = Budget::find($idBudget);
-//
-//                                                // Verifique se o orçamento foi encontrado
-//                                                if ($budget) {
-//                                                    // Crie o status history com os dados fornecidos
-//                                                    $budget->statusHistories()->create([
-//                                                        'status' => $data['status_id'],
-//                                                        'comments' => $data['comments'],
-//                                                        'changed_by' => auth()->id(),
-//                                                        'budget_id' => $idBudget, // Vincula ao orçamento
-//                                                    ]);
-//                                                } else {
-//                                                    dd('Budget não encontrado');
-//                                                }
-//                                            })
-//                                            ->modalHeading('Alterar Status')
-//                                        ,
-//                                    )
-//                                    ->extraAttributes(function ($record) {
-//
-//                                        $status = $record->status ?? 'STATUS_UNKNOWN';
-//                                        $statusColor = $this->getStatusColor($status);
-//                                        return [
-//                                            'class' => "bg-{$statusColor} text-white py-2 px-3",
-//                                        ];
-//                                    })
-//                                    ->columnSpan(2),
-//
-//                                TextEntry::make('created_at')
-//
-////                            ->extraAttributes(['class' => 'border'])
-//                                    ->label('Fecha:')
-//                                    ->formatStateUsing(fn($state) => \Carbon\Carbon::parse($state)->format('d/m/y - H:i:s'))
-//                                    ->columnSpan(2),
-//                                TextEntry::make('comments')
-//                                    ->label('Comentarios:')
-//                                    ->columnSpan(2),
-//
-////                                    ->extraAttributes([
-////                                        'style' => 'overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
-////                                    ])
-//
-//                            ])
-//                            ->extraAttributes(['class' => 'bg-white p-2 dark:bg-gray-900 dark:text-white']),
-//
-//                    ])
-//            ]);
-//    }
+
 
     public function headertInfolist(Infolist $infolist): Infolist
     {
@@ -229,30 +104,81 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
         return $infolist
             ->record($this->budget)
             ->schema([
-                \Filament\Infolists\Components\Grid::make(3) // Grid principal com duas colunas
+                \Filament\Infolists\Components\Grid::make(3) // Grid principal com três colunas
                 ->schema([
                     // Primeira Coluna: Cliente
                     Fieldset::make('Cliente')
                         ->schema([
                             TextEntry::make('customer.code')
                                 ->label('Código del Cliente:')
-                                ->extraAttributes(['class' => 'border-b']),
+                                ->suffixAction(
+                                    Action::make('copiar')
+                                        ->icon('heroicon-m-clipboard')
+
+                                        ->action(function ($record) {
+                                            $this->dispatch('clipboard:copied', $record->code);
+                                        })
+                                ),
+
+
                             TextEntry::make('created_at')
                                 ->label('Fecha Presupuesto:')
-                                ->extraAttributes(['class' => 'border-b'])
                                 ->date('d/m/y'),
                             TextEntry::make('customer.name')
                                 ->label('Nombre:')
                                 ->extraAttributes(['class' => 'border-b'])
-                                ->columnSpan(2),
+                                ->suffixAction(
+                                    Action::make('copiar')
+                                        ->icon('heroicon-m-clipboard')
+
+                                        ->action(function ($record) {
+                                            $this->dispatch('clipboard:copied', $record->customer->name);
+                                        })
+                                ),
+                            TextEntry::make('customer.document')
+                                ->label('Dni/Nif:')
+                                ->extraAttributes(['class' => 'border-b'])
+                                ->suffixAction(
+                                    Action::make('copiar')
+                                        ->icon('heroicon-m-clipboard')
+
+                                        ->action(function ($record) {
+                                            $this->dispatch('clipboard:copied', $record->customer->document);
+                                        })
+                                ),
+
                             TextEntry::make('customer.email')
-                                ->label('E-mail:')
+                                ->label('Correo Eletronico:')
+                                ->suffixAction(
+                                    Action::make('copiar')
+                                        ->icon('heroicon-m-clipboard')
+
+                                        ->action(function ($record) {
+                                            $this->dispatch('clipboard:copied', $record->customer->email);
+                                        })
+                                )
                                 ->extraAttributes(['class' => 'border-b']),
                             TextEntry::make('customer.phone')
                                 ->label('Teléfono:')
+                                ->suffixAction(
+                                    Action::make('copiar')
+                                        ->icon('heroicon-m-clipboard')
+
+                                        ->action(function ($record) {
+                                            $this->dispatch('clipboard:copied', $record->customer->phone);
+                                        })
+                                )
                                 ->extraAttributes(['class' => 'border-b']),
                             TextEntry::make('customer.address')
                                 ->label('Direccion:')
+                                ->suffixAction(
+                                    Action::make('copiar')
+                                        ->icon('heroicon-m-clipboard')
+
+                                        ->action(function ($record) {
+                                            $this->dispatch('clipboard:copied', $record->customer->address);
+                                        })
+                                )
                                 ->extraAttributes(['class' => 'border-b'])
                                 ->columnSpan(2),
                         ])
@@ -264,8 +190,8 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                         ->schema([
                             TextEntry::make('status')
                                 ->label('Status')
-                                ->getStateUsing(function ($record) {
 
+                                ->getStateUsing(function ($record) {
                                     if ($record->latestStatus) {
                                         $statusOptions = StatusHistory::getStatusOptions();
                                         return $statusOptions[$record->latestStatus->status] ?? 'Status desconhecido';
@@ -303,12 +229,11 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         ->modalHeading('Alterar Status')
                                 )
                                 ->extraAttributes(function ($record) {
-                                    $status = $record->status ?? 'STATUS_UNKNOWN';
+                                    $status = $record->latestStatus ? $record->latestStatus->status : 'STATUS_UNKNOWN';
                                     $statusColor = $this->getStatusColor($status);
-                                    return [
-                                        'class' => "bg-{$statusColor} text-white py-2 px-3",
-                                    ];
+                                    return ['class' => "$statusColor py-2 px-3 rounded-md"];
                                 })
+                                ->color('white')
                                 ->columnSpan(2),
 
                             TextEntry::make('latestStatus.created_at')
@@ -317,14 +242,13 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 ->columnSpan(2),
                             TextEntry::make('latestStatus.comments')
                                 ->label('Comentarios:')
+                                ->extraAttributes(['class' => 'bg-danger-500 text-white'])
                                 ->columnSpan(2),
                         ])
                         ->extraAttributes(['class' => 'bg-white p-2 dark:bg-gray-900 dark:text-white'])
                         ->columnSpan(1), // Coluna 2 do Grid
                 ]),
             ]);
-
-
     }
 
 
@@ -332,25 +256,24 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     {
         // Aqui você define as cores com base no status
         switch ($status) {
-            case 'STATUS_OPEN':
-                return 'primary-500';   // Azul para "Aberto"
-            case 'STATUS_SENT':
-                return 'yellow-500'; // Amarelo para "Enviado"
-            case 'STATUS_PENDING':
-                return 'orange-500'; // Laranja para "Pendiente"
-            case 'STATUS_REJECTED':
-                return 'red-500';    // Vermelho para "Rechazado"
-            case 'STATUS_APPROVED':
-                return 'green-500';  // Verde para "Aprovado"
-            case 'STATUS_IN_PROCESS':
-                return 'purple-500'; // Roxo para "Em processo"
-            case 'STATUS_COMPLETED':
-                return 'gray-500';   // Cinza para "Finalizado"
+            case '1':
+                return 'status-open';   // Azul para "Aberto"
+            case '2':
+                return 'status-sent'; // Amarelo para "Enviado"
+            case '3':
+                return 'status-pending'; // Laranja para "Pendiente"
+            case '4':
+                return 'status-rejected';    // Vermelho para "Rechazado"
+            case '5':
+                return 'status-approved';  // Verde para "Aprovado"
+            case '6':
+                return 'status-in-process'; // Roxo para "Em processo"
+            case '7':
+                return 'status-completed';   // Cinza para "Finalizado"
             default:
-                return 'gray-300';   // Cor padrão para status desconhecido
+                return 'status-default';   // Cor padrão para status desconhecido
         }
     }
-
 
     public function updateBudgetTotal()
     {
@@ -372,6 +295,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     public function updateVisibleColumns()
     {
         $this->visibleColumns = [
+            'service' => $this->service,
+            'description' => $this->description,
+            'qtd' => $this->qtd,
+            'price' => $this->price,
             'tax' => $this->tax,
             'total' => $this->total,
             'total_tax' => $this->total_tax,
@@ -382,6 +309,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
         if ($budget) {
             $budget->update([
+                'show_service' => $this->service,
+                'show_description' => $this->description,
+                'show_qtd' => $this->qtd,
+                'show_price' => $this->price,
                 'show_tax' => $this->tax,
                 'show_total' => $this->total,
                 'show_total_tax' => $this->total_tax,
@@ -393,7 +324,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     {
         $this->visibleColumns[$column] = !$this->visibleColumns[$column];
 
-        // Atualiza a tabela e o Infolist
         $this->dispatch('refreshInfolist');
     }
 
@@ -408,10 +338,16 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                     ->orderBy('sort_order') // Ordena pela coluna `sort_order`
             )
             ->columns([
-                TextColumn::make('product.name')->label(__('Servicio')),
+                TextColumn::make('product.name')->label(__('Servicio'))
+                    ->hidden(fn() => !$this->visibleColumns['service']),
                 TextColumn::make('description')->label(__('Descripción'))
+                    ->hidden(fn() => !$this->visibleColumns['description'])
                     ->html() // Permite renderizar HTML na coluna
                     ->wrap(),
+                TextColumn::make('quantity')->label(__('Cant'))
+                    ->hidden(fn() => !$this->visibleColumns['qtd']),
+                TextColumn::make('price')->label(__('Unid Precio'))
+                    ->hidden(fn() => !$this->visibleColumns['price']),
 
                 TextColumn::make('tax')->label('Iva %')
                     ->hidden(fn() => !$this->visibleColumns['tax']),

@@ -22,9 +22,13 @@ return new class extends Migration
             $table->decimal('total_tax', 10, 2)->default(0);
             $table->decimal('tax', 10, 2)->default(0);
 
-            $table->boolean('show_tax')->default(false);
+            $table->boolean('show_service')->default(true);
+            $table->boolean('show_description')->default(true);
+            $table->boolean('show_qtd')->default(true);
+            $table->boolean('show_price')->default(true);
+            $table->boolean('show_tax')->default(true);
             $table->boolean('show_total')->default(true);
-            $table->boolean('show_total_tax')->default(false);
+            $table->boolean('show_total_tax')->default(true);
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

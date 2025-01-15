@@ -57,6 +57,7 @@
         <legend class="fieldset-legend">Cliente</legend>
         <div>
             <p><b>Nombre:</b> {{ $budget->customer->name }}</p>
+            <p><b>Dni/Nif:</b> {{ $budget->customer->document }}</p>
             <p><b>Direccíon:</b> {{ $budget->customer->address }}</p>
             <p><b>Correo eletronico:</b> {{ $budget->customer->email }}</p>
         </div>
@@ -71,8 +72,18 @@
     <table class="min-w-full mt-8 border-collapse">
         <thead>
         <tr class="bg-gray-200">
+            @if($budget->show_service == true)
             <th class="py-2 px-4 text-left">Servício</th>
+            @endif
+                @if($budget->show_description == true)
             <th class="py-2 px-4 text-left max-w-[420px] ">Descripción</th>
+                @endif
+                @if($budget->show_qtd == true)
+                    <th class="py-2 px-4 text-left">Cant</th>
+                @endif
+                @if($budget->show_price == true)
+                    <th class="py-2 px-4 text-left">Unit Precio</th>
+                @endif
             @if($budget->show_tax == true)
                 <th class="py-2 px-4 text-left">Iva</th>
             @endif
@@ -87,12 +98,26 @@
         <tbody>
         @foreach($budget->items as $item)
             <tr class="border-t">
+                @if($budget->show_service == true)
                 <td class="py-2 px-4 {{ ($item->total == 0)? 'bg-gray-50' : '' }}">
                     {!! ($item->total == 0)? '<b>'.$item->product->name.'</b>':$item->product->name !!}
                 </td>
+                @endif
+                    @if($budget->show_description == true)
                 <td class="py-2 px-4 max-w-[420px]  {{ ($item->total == 0)? 'bg-gray-50' : '' }}">
                     {!! $item->description !!}
                 </td>
+                    @endif
+                    @if($budget->show_qtd == true)
+                        <td class="py-2 px-4 {{ ($item->total == 0)? 'bg-gray-50' : '' }}">
+                            {{ ($item->total == 0)? '': $item->quantity }}
+                        </td>
+                    @endif
+                    @if($budget->show_price == true)
+                        <td class="py-2 px-4 {{ ($item->total == 0)? 'bg-gray-50' : '' }}">
+                            {{ ($item->total == 0)? '': $item->price }}
+                        </td>
+                    @endif
                 @if($budget->show_tax == true)
                     <td class="py-2 px-4 {{ ($item->total == 0)? 'bg-gray-50' : '' }}">
                         {{ ($item->total == 0)? '': $item->tax }}
