@@ -75,10 +75,21 @@ class DashboardPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->renderHook('panels::head.start',
-            fn():string => Vite::useHotFile('hot')
-            ->useBuildDirectory('')
-            ->withEntryPoints(['resources/js/app.js'])->toHtml());
+            ->renderHook('panels::head.start', function () {
+                if (app()->isLocal()) {
+                    // Em desenvolvimento, usa o hot file para o HMR (Hot Module Replacement)
+                    return Vite::useHotFile('http://localhost:5173/hot')
+                        ->useBuildDirectory('build/')
+                        ->withEntryPoints(['resources/js/app.js', 'resources/css/app.css'])
+                        ->toHtml();
+                }
+
+                // Em produção, usa o arquivo de manifesto
+                return Vite::useManifestFile(public_path('build/.vite/manifest.json'))
+                    ->useBuildDirectory('build/')
+                    ->withEntryPoints(['resources/js/app.js', 'resources/css/app.css'])
+                    ->toHtml();
+            });
     }
 
 
