@@ -16,12 +16,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class BudgetResource extends Resource
 {
     protected static ?string $model = Budget::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationLabel = 'Presupuesto';
     protected static ?string $breadcrumb = 'Presupuesto';
-
-
-
     protected static ?string $navigationGroup = 'Menu';
 
     public static function form(Form $form): Form

@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('service_providers', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
             $table->string('name');
+            $table->date('birth_date')->nullable();
             $table->string('email')->unique()->nullable();
             $table->string('phone')->nullable();
             $table->string('service_type')->nullable(); // Ex.: Consultoria, Suporte Técnico

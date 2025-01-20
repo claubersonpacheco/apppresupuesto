@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('product_suppliers',
             function (Blueprint $table) {
                 $table->id();
+                $table->string('code')->unique();
                 $table->string('name');
                 $table->string('email')->nullable()->nullable();
                 $table->string('phone')->nullable();

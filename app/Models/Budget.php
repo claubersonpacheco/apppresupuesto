@@ -54,4 +54,14 @@ class Budget extends Model
     {
         return $this->hasOne(StatusHistory::class)->latestOfMany();
     }
+
+    public function serviceProviders()
+    {
+        return $this->hasMany(ServiceProvider::class);
+    }
+
+    public function productSuppliers()
+    {
+        return $this->hasMany(ProductSupplier::class);
+    }
 }
