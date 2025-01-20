@@ -18,7 +18,7 @@ class ToolCategoriesResource extends Resource
 {
     protected static ?string $model = ToolCategory::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = 'Categoria';
+    protected static ?string $navigationLabel = 'Categoria Herramientas';
     protected static ?string $breadcrumb = 'Categoria Herramientas';
     protected static ?string $navigationGroup = 'Administración';
     public static function form(Form $form): Form

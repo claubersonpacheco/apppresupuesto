@@ -21,7 +21,7 @@ class ToolResource extends Resource
     protected static ?string $breadcrumb = 'Herramientas';
     protected static ?string $navigationGroup = 'Administración';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-wrench';
 
     public static function form(Form $form): Form
     {

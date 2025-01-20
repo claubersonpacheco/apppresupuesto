@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class BudgetResource extends Resource
 {
     protected static ?string $model = Budget::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationLabel = 'Presupuesto';
     protected static ?string $breadcrumb = 'Presupuesto';
 
@@ -75,7 +75,7 @@ class BudgetResource extends Resource
 
                 Tables\Columns\TextColumn::make('latestStatus.status_label')
                     ->label('Status')
-                    ->sortable()
+                    ->badge()
                     ->color(fn ($state, $record) => match ($record->latestStatus?->status) {
                         1 => 'primary',    // Aberto
                         5 => 'success',    // Aprovado
