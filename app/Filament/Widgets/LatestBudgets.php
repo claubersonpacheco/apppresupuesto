@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Resources\BudgetResource;
+use App\Models\Budget;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -51,6 +52,15 @@ class LatestBudgets extends BaseWidget
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
+
+            ])
+            ->actions([
+                Tables\Actions\Action::make('manage_items')
+                    ->label('Servicios')
+                    ->url(fn (Budget $record): string => "/dashboard/budgets/{$record->getKey()}/items")
+                    ->icon('heroicon-o-cog'), // Adicione um ícone apropriado
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ]);
     }
 }

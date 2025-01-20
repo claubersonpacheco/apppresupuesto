@@ -375,7 +375,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->required(),
 
                                 Select::make('product_id')
-                                    ->label('Produto')
+                                    ->label(__('Service'))
                                     ->options(Product::all()->pluck('name', 'id'))
                                     ->required()
                                     ->reactive()
@@ -389,7 +389,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->columns(1),
 
                                 TextInput::make('quantity')
-                                    ->label('Quantidade')
+                                    ->label(__('Quantity'))
                                     ->numeric()
                                     ->required()
                                     ->reactive()
@@ -401,7 +401,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     }),
 
                                 TextInput::make('price')
-                                    ->label('Preço Unitário')
+                                    ->label(__('Price Unit'))
                                     ->required()
                                     ->reactive()
                                     ->default(fn($get) => $get('product_id') ? Product::find($get('product_id'))->price : null)

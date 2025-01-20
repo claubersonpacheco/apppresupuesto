@@ -35,9 +35,9 @@ class ItemsBudget extends Page
                 ->icon('heroicon-o-printer')
                 ->color('warning')
                 ->openUrlInNewTab(),
-            Action::make('Generar PDF')
+            Action::make('PDF')
             ->url(route('budget.pdf', $this->record))
-                ->icon('heroicon-o-printer')
+                ->icon('heroicon-o-document-text')
                 ->color('success'),
             Action::make('Voltar')
                 ->url('/dashboard/budgets')

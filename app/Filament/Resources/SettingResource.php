@@ -30,9 +30,14 @@ class SettingResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('title')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                ->columnSpan(2),
                 Forms\Components\FileUpload::make('logo')
                     ->directory('logo')
+                    ->image()
+                    ->imageEditor(),
+                Forms\Components\FileUpload::make('logo_impress')
+                    ->directory('logo/impress')
                     ->image()
                     ->imageEditor(),
 
@@ -41,7 +46,8 @@ class SettingResource extends Resource
                     ->image()
                     ->imageEditor(),
                 Forms\Components\TextInput::make('address')
-                    ->maxLength(100),
+                    ->maxLength(100)
+                ->columnSpan(2),
                 Forms\Components\TextInput::make('city')
                     ->maxLength(100),
                 Forms\Components\TextInput::make('postal_code')

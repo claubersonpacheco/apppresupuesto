@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('logo')->nullable();
+            $table->string('logo_impress')->nullable();
             $table->string('email')->nullable();
             $table->string('address')->nullable();
             $table->string('city')->nullable();
