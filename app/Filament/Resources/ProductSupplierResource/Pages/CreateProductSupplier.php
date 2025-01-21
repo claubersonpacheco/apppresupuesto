@@ -52,6 +52,6 @@ class CreateProductSupplier extends CreateRecord
     protected function getRedirectUrl(): string
     {
         // Redirecionar para a página de visualização do item recém-criado
-        return $this->getResource()::getUrl('items', ['record' => $this->record->getKey()]);
+        return $this->getResource()::getUrl('index');
     }
 }

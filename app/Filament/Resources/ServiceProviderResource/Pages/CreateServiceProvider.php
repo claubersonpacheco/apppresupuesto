@@ -51,4 +51,10 @@ class CreateServiceProvider extends CreateRecord
                     ->maxLength(255),
             ]);
     }
+
+    protected function getRedirectUrl(): string
+    {
+        // Redirecionar para a página de visualização do item recém-criado
+        return $this->getResource()::getUrl('index');
+    }
 }
