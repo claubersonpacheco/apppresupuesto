@@ -23,6 +23,8 @@ class ToolResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench';
 
+    protected static ?int $navigationSort = 12;
+
     public static function form(Form $form): Form
     {
         return $form

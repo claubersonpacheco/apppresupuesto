@@ -17,12 +17,17 @@ class ServiceProviderResource extends Resource
 {
     protected static ?string $model = ServiceProvider::class;
 
+    protected static ?string $title = 'Prestador de Servícios';
+
     protected static ?string $navigationIcon = 'heroicon-o-face-smile';
 
     protected static ?string $navigationLabel = 'Prestador de Servicios';
     protected static ?string $breadcrumb = 'Prestador de Servicios';
 
     protected static ?string $navigationGroup = 'Menu';
+
+    protected static ?int $navigationSort = 6;
+
 
     public static function form(Form $form): Form
     {
@@ -63,12 +68,14 @@ class ServiceProviderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('birth_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
@@ -76,16 +83,22 @@ class ServiceProviderResource extends Resource
                 Tables\Columns\TextColumn::make('service_type')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('city')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('state')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('zip')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('document')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('bank_account')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

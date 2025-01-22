@@ -21,6 +21,7 @@ class ProductSupplierResource extends Resource
     protected static ?string $navigationLabel = 'Fornecedores';
     protected static ?string $breadcrumb = 'Fornecedores';
     protected static ?string $navigationGroup = 'Menu';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

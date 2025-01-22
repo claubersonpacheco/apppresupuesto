@@ -21,6 +21,8 @@ class ToolCategoriesResource extends Resource
     protected static ?string $navigationLabel = 'Categoria Herramientas';
     protected static ?string $breadcrumb = 'Categoria Herramientas';
     protected static ?string $navigationGroup = 'Administración';
+
+    protected static ?int $navigationSort = 13;
     public static function form(Form $form): Form
     {
         return $form

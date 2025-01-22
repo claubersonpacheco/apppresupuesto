@@ -24,6 +24,8 @@ class SettingResource extends Resource
     protected static ?string $breadcrumb = 'ajustes';
     protected static ?string $navigationGroup = 'Administración';
 
+    protected static ?int $navigationSort = 10;
+
     public static function form(Form $form): Form
     {
         return $form

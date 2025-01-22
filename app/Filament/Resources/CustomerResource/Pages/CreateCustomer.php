@@ -15,6 +15,7 @@ class CreateCustomer extends CreateRecord
     use GeneratesAutomaticCode;
 
     protected static string $resource = CustomerResource::class;
+
     protected static ?string $title = 'Nuevo Cliente';
 
     public function form(Form $form): Form
