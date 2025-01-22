@@ -25,6 +25,8 @@ return new class extends Migration
                 $table->string('zip')->nullable();
                 $table->string('document')->nullable();
                 $table->string('bank_account')->nullable();
+                $table->boolean('client')->default(false);
+                $table->string('code_client')->nullable();
                 $table->timestamps();
             });
     }

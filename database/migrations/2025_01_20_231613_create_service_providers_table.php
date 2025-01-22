@@ -23,8 +23,9 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('state')->nullable();
             $table->string('zip')->nullable();
-            $table->boolean('client')->default(false);
-            $table->string('code_client')->nullable();
+            $table->string('document')->nullable();
+            $table->string('bank_account')->nullable();
+
             $table->timestamps();
         });
     }
