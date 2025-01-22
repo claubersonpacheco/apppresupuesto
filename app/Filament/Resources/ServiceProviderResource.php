@@ -17,7 +17,7 @@ class ServiceProviderResource extends Resource
 {
     protected static ?string $model = ServiceProvider::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-face-smile';
 
     protected static ?string $navigationLabel = 'Prestador de Servicios';
     protected static ?string $breadcrumb = 'Prestador de Servicios';

@@ -16,8 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class ProductSupplierResource extends Resource
 {
     protected static ?string $model = ProductSupplier::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
 
     protected static ?string $navigationLabel = 'Fornecedores';
     protected static ?string $breadcrumb = 'Fornecedores';
