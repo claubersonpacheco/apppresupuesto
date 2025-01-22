@@ -18,7 +18,11 @@ class BudgetController extends Controller
     public function generatePDF($id)
     {
 
-        $budget = Budget::find($id);
+        $budget = Budget::where('id', $id)
+            ->with(['items' => function ($query) {
+                $query->orderBy('sort_order', 'asc');
+            }])
+            ->first();
 
         $pdfName = $budget->code.'.pdf';
         $storagePath = storage_path('app/reports/'.$pdfName);
@@ -84,7 +88,11 @@ class BudgetController extends Controller
     public function print($id)
     {
 
-        $budget = Budget::find($id);
+        $budget = Budget::where('id', $id)
+            ->with(['items' => function ($query) {
+                $query->orderBy('sort_order', 'asc');
+            }])
+            ->first();
         $setting = Setting::first();
 
 
