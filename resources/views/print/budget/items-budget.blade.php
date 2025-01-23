@@ -49,6 +49,7 @@
             <p>{{ $setting->city }} - {{ $setting->postal_code }}</p>
             <p>{{ $setting->email }}</p>
             <p>{{ $setting->whatsapp }}</p>
+                <p>NIF: {{ $setting->document }}</p>
         </div>
     </div>
 

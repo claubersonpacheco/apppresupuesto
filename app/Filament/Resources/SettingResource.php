@@ -34,6 +34,11 @@ class SettingResource extends Resource
                     ->required()
                     ->maxLength(255)
                 ->columnSpan(2),
+                Forms\Components\TextInput::make('document')
+                    ->required()
+                    ->label('Nif')
+                    ->maxLength(255)
+                    ->columnSpan(2),
                 Forms\Components\FileUpload::make('logo')
                     ->directory('logo')
                     ->image()
@@ -75,16 +80,9 @@ class SettingResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('logo')
-                    ->circular(),
 
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
-
-                ImageColumn::make('favicon')
-                    ->circular(),
-
-
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
