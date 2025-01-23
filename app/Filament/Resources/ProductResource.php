@@ -55,7 +55,7 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('code')
                     ->label('Codigo')
                     ->required()
-                    ->maxLength(10),
+                    ->maxLength(13),
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre')
                     ->required()
@@ -67,7 +67,9 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('price')
                     ->label('Precio')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->rules('numeric|min:0'),
+
                 Forms\Components\Select::make('product_type')
                     ->label('Tipo')
                     ->options([

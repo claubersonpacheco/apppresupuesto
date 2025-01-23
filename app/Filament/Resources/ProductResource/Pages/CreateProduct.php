@@ -69,7 +69,8 @@ class CreateProduct extends CreateRecord
                 TextInput::make('price')
                     ->label('Precio')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->rules('numeric|min:0'),
                 Select::make('product_type')
                     ->label('Tipo')
                     ->options([

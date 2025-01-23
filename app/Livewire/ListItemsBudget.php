@@ -391,9 +391,15 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 TextInput::make('quantity')
                                     ->label(__('Quantity'))
                                     ->numeric()
+                                    ->rules('numeric|min:0')
                                     ->required()
                                     ->reactive()
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
+                                        if ($state < 0) {
+                                            $set('quantity', 0); // Define como 0 se for negativo
+                                            return; // Sai da execução
+                                        }
+
                                         $total = $get('price') * $state;
                                         $set('total', $total);
                                         $tax = (int)$get('tax') / 100;
@@ -402,7 +408,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
                                 TextInput::make('price')
                                     ->label(__('Price Unit'))
+                                    ->rules('numeric|min:0')
                                     ->required()
+                                    ->numeric()
+                                    ->rules('numeric|min:0')
                                     ->reactive()
                                     ->default(fn($get) => $get('product_id') ? Product::find($get('product_id'))->price : null)
                                     ->afterStateHydrated(function (callable $set, $state, $get) {
@@ -414,6 +423,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         }
                                     })
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
+                                        if ($state < 0) {
+                                            $set('price', 0); // Define como 0 se for negativo
+                                            return; // Sai da execução
+                                        }
                                         $total = $state * $get('quantity');
                                         $set('total', $total);
                                         $tax = (int)$get('tax') / 100;
@@ -485,6 +498,12 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->required()
                                     ->reactive()
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
+
+                                        if ($state < 0) {
+                                            $set('quantity', 0); // Define como 0 se for negativo
+                                            return; // Sai da execução
+                                        }
+
                                         $total = $get('price') * $state;
                                         $set('total', $total);
                                         $tax = (int)$get('tax') / 100;
@@ -494,6 +513,8 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 TextInput::make('price')
                                     ->label('Preço Unitário')
                                     ->required()
+                                    ->numeric()
+                                    ->rules('numeric|min:0')
                                     ->reactive()
                                     ->default(fn($get) => $get('product_id') ? Product::find($get('product_id'))->price : null)
                                     ->afterStateHydrated(function (callable $set, $state, $get) {
@@ -505,6 +526,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         }
                                     })
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
+                                        if ($state < 0) {
+                                            $set('price', 0); // Define como 0 se for negativo
+                                            return; // Sai da execução
+                                        }
                                         $total = $state * $get('quantity');
                                         $set('total', $total);
                                         $tax = (int)$get('tax') / 100;
