@@ -55,7 +55,7 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('code')
                     ->label('Codigo')
                     ->required()
-                    ->maxLength(13),
+                    ->maxLength(20),
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre')
                     ->required()
