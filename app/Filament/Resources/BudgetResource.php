@@ -67,11 +67,6 @@ class BudgetResource extends Resource
                     ->label('Cliente')
                     ->sortable(),
 
-
-                Tables\Columns\TextColumn::make('total')
-                    ->label('Valor')
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('latestStatus.status_label')
                     ->label('Status')
                     ->badge()

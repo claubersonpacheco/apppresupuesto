@@ -34,9 +34,9 @@
         </div>
         <div class="text-right">
 
-            @if($setting->logo != '')
+            @if($setting->logo_impress != '')
                 @php
-                    $imagePath = storage_path('app/public/'.$setting->logo);
+                    $imagePath = storage_path('app/public/'.$setting->logo_impress);
                     $imageBase64 = 'data:image/png;base64,'.base64_encode(file_get_contents($imagePath));
                 @endphp
 
