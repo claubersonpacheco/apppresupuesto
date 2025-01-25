@@ -217,7 +217,7 @@
     "Upgrade Required": "Atualização Necessária",
     "URI Too Long": "URI Muito Grande",
     "Use Proxy": "Usar proxy",
-    "User": "Do utilizador",
+    "User": "Usuário",
     "Variant Also Negotiates": "Variante Também Negocia",
     "Verify Email Address": "Verifique o endereço de e-mail",
     "View": "Visualizar",
@@ -268,6 +268,7 @@
     "Title" : "Título",
     "Logo impress": "Logo de Impressão",
     "Postal code" : "Código Postal",
-    "Send email" : "Email de envio"
+    "Send email" : "Email de envio",
+    "Dashboard": "Painel de Controle"
 
 }
