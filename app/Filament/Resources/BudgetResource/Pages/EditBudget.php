@@ -9,13 +9,10 @@ use Filament\Resources\Pages\EditRecord;
 class EditBudget extends EditRecord
 {
     protected static string $resource = BudgetResource::class;
-
-    protected static ?string $title = 'Editar Presupuesto';
-
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('Voltar')
+            Actions\Action::make(__('Back'))
             ->url('/dashboard/budgets')
             ->icon('heroicon-o-arrow-uturn-left')
         ];

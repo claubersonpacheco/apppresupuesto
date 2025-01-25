@@ -18,34 +18,42 @@ class BudgetResource extends Resource
     protected static ?string $model = Budget::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
-    protected static ?string $navigationLabel = 'Presupuesto';
-    protected static ?string $breadcrumb = 'Presupuesto';
     protected static ?string $navigationGroup = 'Menu';
     protected static ?int $navigationSort = 2;
+
+    public static function getModelLabel(): string
+    {
+        return __('Budget');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('code')
-                    ->label('Código')
+                    ->label('Code')
+                    ->translateLabel()
                     ->required()
                     ->disabled()
-                    ->maxLength(10),
+                    ->maxLength(20),
 
                 Forms\Components\Select::make('customer_id')
-                    ->label('Cliente')
+                    ->label('Client')
+                    ->translateLabel()
                     ->relationship('customer', 'name')
                     ->disabled(),
 
 
                 Forms\Components\TextInput::make('name')
+                    ->label('Name')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255)
                     ->columnSpan('full'),
 
                 Forms\Components\RichEditor::make('description')
-                    ->label('Observación')
+                    ->label('Description')
+                    ->translateLabel()
                     ->maxLength(255)
                     ->columnSpan('full'),
             ]);
@@ -57,14 +65,16 @@ class BudgetResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
-                    ->label('Código')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Servicio')
+                    ->label('Service')
+                    ->translateLabel()
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('customer.name')
-                    ->label('Cliente')
+                    ->label('Client')
+                    ->translateLabel()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('latestStatus.status_label')
@@ -84,6 +94,8 @@ class BudgetResource extends Resource
 
 
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created')
+                    ->translateLabel()
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -93,7 +105,8 @@ class BudgetResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('manage_items')
-                    ->label('Servicios')
+                    ->label('Service')
+                    ->translateLabel()
                     ->url(fn (Budget $record): string => self::getUrl('items', ['record' => $record]))
                     ->icon('heroicon-o-cog'), // Adicione um ícone apropriado
                 Tables\Actions\EditAction::make(),

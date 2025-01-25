@@ -18,18 +18,24 @@ class ToolCategoriesResource extends Resource
 {
     protected static ?string $model = ToolCategory::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = 'Categoria Herramientas';
-    protected static ?string $breadcrumb = 'Categoria Herramientas';
+
     protected static ?string $navigationGroup = 'Administración';
 
     protected static ?int $navigationSort = 13;
+
+    public static function getModelLabel(): string
+    {
+        return __('Tool category');
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->translateLabel()
                 ->required(),
                 Forms\Components\RichEditor::make('description')
+                    ->translateLabel()
                     ->columnSpanFull(),
             ]);
     }
@@ -38,13 +44,15 @@ class ToolCategoriesResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->translateLabel(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->translateLabel(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

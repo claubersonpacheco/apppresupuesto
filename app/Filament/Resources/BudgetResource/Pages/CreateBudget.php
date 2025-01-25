@@ -16,9 +16,6 @@ class CreateBudget extends CreateRecord
     use GeneratesAutomaticCode;
 
     protected static string $resource = BudgetResource::class;
-
-    protected static ?string $title = 'Nuevo Presupuesto';
-
     public function form(Form $form): Form
     {
 
@@ -31,33 +28,41 @@ class CreateBudget extends CreateRecord
                     ->maxLength(20),
 
                 Select::make('customer_id')
-                    ->label('Cliente')
+                    ->label('Client')
+                    ->translateLabel()
                     ->relationship('customer', 'name')
                     ->required()
                     ->createOptionForm([
                         TextInput::make('name')
+                            ->translateLabel()
                             ->required()
                             ->unique()
                             ->maxLength(255),
                         TextInput::make('email')
+                            ->translateLabel()
                             ->required()
                             ->unique()
                             ->email()
                             ->maxLength(255),
                         TextInput::make('phone')
+                            ->translateLabel()
                             ->required()
                             ->maxLength(255),
                         TextInput::make('address')
+                            ->translateLabel()
                             ->required()
                             ->maxLength(255),
                     ]),
 
                 TextInput::make('name')
+                    ->translateLabel()
                     ->required()
+                    ->translateLabel()
                     ->maxLength(255)
                     ->columnSpan('full'),
 
                 RichEditor::make('description')
+                    ->translateLabel()
                     ->maxLength(255)
                     ->columnSpan('full'),
 

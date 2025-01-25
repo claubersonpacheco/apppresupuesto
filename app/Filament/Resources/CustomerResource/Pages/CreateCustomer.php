@@ -23,29 +23,30 @@ class CreateCustomer extends CreateRecord
         return $form
             ->schema([
                 TextInput::make('code')
-                    ->label('Código')
+                   ->translateLabel()
                     ->required()
                     ->default(fn () =>
                         $this->generateCode(Customer::class)
                     ) // Define o próximo código como padrão
                     ->maxLength(20),
                 Forms\Components\TextInput::make('name')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255)
                     ->columnSpan(2),
                 Forms\Components\TextInput::make('email')
-                    ->label('Correo Eletronico')
+                    ->translateLabel()
                     ->required()
                     ->email()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
-                    ->label('Telefono')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('document')
-                    ->label('Documentación'),
+                    ->translateLabel(),
                 Forms\Components\TextInput::make('address')
-                    ->label('Direccion')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255),
             ]);

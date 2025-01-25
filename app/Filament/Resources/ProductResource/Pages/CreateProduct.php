@@ -23,8 +23,6 @@ class CreateProduct extends CreateRecord
 
     protected static string $resource = ProductResource::class;
 
-    protected static ?string $title = 'Nuevo Servício';
-
     public function form(Form $form): Form
     {
 

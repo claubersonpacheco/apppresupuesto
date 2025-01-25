@@ -12,8 +12,6 @@ class ItemsBudget extends Page
 {
     use InteractsWithForms;
 
-    protected static ?string $title = 'Items Presupuesto';
-
     public $record = null;
 
     protected static ?string $model = Budget::class;
@@ -30,7 +28,7 @@ class ItemsBudget extends Page
     {
         return [
 
-            Action::make('Imprimir')
+            Action::make(__('Print'))
                 ->url(route('budget.print', $this->record))
                 ->icon('heroicon-o-printer')
                 ->color('warning')
@@ -39,7 +37,7 @@ class ItemsBudget extends Page
             ->url(route('budget.pdf', $this->record))
                 ->icon('heroicon-o-document-text')
                 ->color('success'),
-            Action::make('Voltar')
+            Action::make(__('Back'))
                 ->url('/dashboard/budgets')
                 ->icon('heroicon-o-arrow-uturn-left'),
 

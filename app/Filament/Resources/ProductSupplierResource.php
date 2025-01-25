@@ -17,9 +17,11 @@ class ProductSupplierResource extends Resource
 {
     protected static ?string $model = ProductSupplier::class;
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
+    public static function getModelLabel(): string
+    {
+        return __('Fornecedores');
+    }
 
-    protected static ?string $navigationLabel = 'Fornecedores';
-    protected static ?string $breadcrumb = 'Fornecedores';
     protected static ?string $navigationGroup = 'Menu';
     protected static ?int $navigationSort = 4;
 
@@ -28,34 +30,51 @@ class ProductSupplierResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('code')
+                    ->translateLabel()
                     ->required()
+                    ->disabled()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('name')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
+                    ->translateLabel()
                     ->email()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
+                    ->translateLabel()
                     ->tel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('service_type')
+                    ->label("Service type")
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('city')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('state')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('zip')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('document')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('bank_account')
+                    ->label("Bank account")
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\Toggle::make('client')
+                    ->translateLabel()
+                    ->label('¿Es cliente?')
                     ->required(),
                 Forms\Components\TextInput::make('code_client')
+                    ->translateLabel()
                     ->maxLength(255),
             ]);
     }
@@ -65,36 +84,23 @@ class ProductSupplierResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('service_type')
+                    ->translateLabel()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('city')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('state')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('zip')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('document')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('bank_account')
-                    ->searchable(),
-                Tables\Columns\IconColumn::make('client')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('code_client')
-                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -104,6 +110,7 @@ class ProductSupplierResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

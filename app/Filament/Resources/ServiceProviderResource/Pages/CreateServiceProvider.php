@@ -24,33 +24,45 @@ class CreateServiceProvider extends CreateRecord
         return $form
             ->schema([
                 TextInput::make('code')
+                    ->translateLabel()
                     ->required()
                     ->default(fn () => $this->generateCode(ServiceProvider::class))
                     ->maxLength(255),
                 TextInput::make('name')
+                    ->translateLabel()
                     ->required()
                     ->columnSpan(2)
                     ->maxLength(255),
-                DatePicker::make('birth_date'),
+                DatePicker::make('birth_date')
+                    ->translateLabel(),
                 TextInput::make('email')
+                    ->translateLabel()
                     ->email()
                     ->maxLength(255),
                 TextInput::make('phone')
+                    ->translateLabel()
                     ->tel()
                     ->maxLength(255),
                 TextInput::make('service_type')
+                    ->translateLabel()
                     ->maxLength(255),
                 TextInput::make('address')
+                    ->translateLabel()
                     ->maxLength(255),
                 TextInput::make('city')
+                    ->translateLabel()
                     ->maxLength(255),
                 TextInput::make('state')
+                    ->translateLabel()
                     ->maxLength(255),
                 TextInput::make('zip')
+                    ->translateLabel()
                     ->maxLength(255),
                 TextInput::make('document')
+                    ->translateLabel()
                     ->maxLength(255),
                 TextInput::make('bank_account')
+                    ->translateLabel()
                     ->maxLength(255),
             ]);
     }

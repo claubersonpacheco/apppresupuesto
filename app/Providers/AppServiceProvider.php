@@ -9,7 +9,8 @@ use App\Observers\BudgetObserver;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
 
-use Filament\Support\Assets\Js;
+
+use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
     {
         Budget::observe(BudgetObserver::class);
         BudgetItem::observe(BudgetItemObserver::class);
+
+        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
+            $switch
+                ->locales(['es','en','pt_br']); // also accepts a closure
+        });
 
     }
 }

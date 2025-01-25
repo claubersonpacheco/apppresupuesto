@@ -26,24 +26,32 @@ class SettingResource extends Resource
 
     protected static ?int $navigationSort = 10;
 
+    public static function getModelLabel(): string
+    {
+        return __('Settings');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('title')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255)
                 ->columnSpan(2),
                 Forms\Components\TextInput::make('document')
+                    ->translateLabel()
                     ->required()
-                    ->label('Nif')
                     ->maxLength(255)
                     ->columnSpan(2),
                 Forms\Components\FileUpload::make('logo')
+                    ->translateLabel()
                     ->directory('logo')
                     ->image()
                     ->imageEditor(),
                 Forms\Components\FileUpload::make('logo_impress')
+                    ->translateLabel()
                     ->directory('logo/impress')
                     ->image()
                     ->imageEditor(),
@@ -53,20 +61,23 @@ class SettingResource extends Resource
                     ->image()
                     ->imageEditor(),
                 Forms\Components\TextInput::make('address')
+                    ->translateLabel()
                     ->maxLength(100)
                 ->columnSpan(2),
                 Forms\Components\TextInput::make('city')
+                    ->translateLabel()
                     ->maxLength(100),
                 Forms\Components\TextInput::make('postal_code')
+                    ->translateLabel()
                     ->maxLength(10),
 
                 Forms\Components\TextInput::make('email')
-                    ->label('Email contacto')
+                    ->translateLabel()
                     ->email()
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('send_email')
-                    ->label('Email config')
+                    ->translateLabel()
                     ->email()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('whatsapp')

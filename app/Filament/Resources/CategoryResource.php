@@ -21,17 +21,23 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationGroup = 'Menu';
 
-    protected static ?string $navigationLabel = 'Categoria Servicios';
     protected static ?int $navigationSort = 8;
+
+    public static function getModelLabel(): string
+    {
+        return __('Category');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')->columnSpan(1)
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\RichEditor::make('description')->columnSpan('2'),
+                Forms\Components\RichEditor::make('description')->columnSpan('2')
+                ->translateLabel(),
             ])
             ->columns(2);
     }
@@ -40,8 +46,8 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d/m/Y H:i:s'),
+                Tables\Columns\TextColumn::make('name')->translateLabel(),
+                Tables\Columns\TextColumn::make('created_at')->dateTime('d/m/Y H:i:s')->translateLabel(),
             ])
             ->filters([
                 //

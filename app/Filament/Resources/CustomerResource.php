@@ -17,44 +17,43 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-identification';
-
-    protected static ?string $navigationLabel = 'Clientes';
-
-    protected static ?string $breadcrumb = 'Cliente';
-
     protected static ?int $navigationSort = 3;
-
     protected static ?string $navigationGroup = 'Menu';
 
+    public static function getModelLabel(): string
+    {
+        return __('Customer');
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('code')
+                    ->translateLabel()
                     ->required()
                     ->disabled()
-                    ->maxLength(50),
+                    ->maxLength(20),
                 Forms\Components\TextInput::make('name')
+                    ->translateLabel()
                     ->required()
-                    ->maxLength(255)
+                    ->maxLength(100)
                     ->columnSpan(2),
                 Forms\Components\TextInput::make('email')
-                    ->label('Correo Eletronico')
+                    ->translateLabel()
                     ->required()
                     ->email()
-                    ->maxLength(255),
+                    ->maxLength(100),
                 Forms\Components\TextInput::make('phone')
-                    ->label('Telefono')
+                    ->translateLabel()
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(15),
                 Forms\Components\TextInput::make('document')
-                ->label('Documentación'),
+                    ->translateLabel(),
                 Forms\Components\TextInput::make('address')
-                    ->label('Direccion')
+                    ->translateLabel()
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(100),
             ]);
     }
 
@@ -62,10 +61,10 @@ class CustomerResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('phone')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime(),
+                Tables\Columns\TextColumn::make('name')->translateLabel()->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('email')->translateLabel()->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('phone')->translateLabel()->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('created_at')->translateLabel()->dateTime(),
             ])
             ->filters([
                 //

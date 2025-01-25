@@ -24,14 +24,14 @@ class LatestBudgets extends BaseWidget
             ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('code')
-                    ->label('Código')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Servicio')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('customer.name')
-                    ->label('Cliente')
+                    ->translateLabel()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('latestStatus.status_label')
@@ -50,6 +50,7 @@ class LatestBudgets extends BaseWidget
 
 
                 Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
                     ->dateTime()
                     ->sortable(),
 
@@ -60,7 +61,6 @@ class LatestBudgets extends BaseWidget
                     ->url(fn (Budget $record): string => "/dashboard/budgets/{$record->getKey()}/items")
                     ->icon('heroicon-o-cog'), // Adicione um ícone apropriado
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ]);
     }
 }

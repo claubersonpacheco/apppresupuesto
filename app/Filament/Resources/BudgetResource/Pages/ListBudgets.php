@@ -10,13 +10,12 @@ class ListBudgets extends ListRecords
 {
     protected static string $resource = BudgetResource::class;
 
-    protected static ?string $title = 'Presupuestos';
-
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-            ->label('Nuevo Presupuesto'),
+            ->label('New Budget')
+            ->translateLabel(),
         ];
     }
 }

@@ -17,12 +17,12 @@ class ServiceProviderResource extends Resource
 {
     protected static ?string $model = ServiceProvider::class;
 
-    protected static ?string $title = 'Prestador de Servícios';
-
     protected static ?string $navigationIcon = 'heroicon-o-face-smile';
 
-    protected static ?string $navigationLabel = 'Prestador de Servicios';
-    protected static ?string $breadcrumb = 'Prestador de Servicios';
+    public static function getModelLabel(): string
+    {
+        return __('Service Provider');
+    }
 
     protected static ?string $navigationGroup = 'Menu';
 
@@ -34,31 +34,45 @@ class ServiceProviderResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('code')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('name')
+                    ->translateLabel()
                     ->required()
+                    ->translateLabel()
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('birth_date'),
+                Forms\Components\DatePicker::make('birth_date')
+                ->translateLabel(),
                 Forms\Components\TextInput::make('email')
+                    ->translateLabel()
                     ->email()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
+                    ->translateLabel()
                     ->tel()
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('service_type')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('city')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('state')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('zip')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('document')
+                    ->translateLabel()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('bank_account')
+                    ->translateLabel()
                     ->maxLength(255),
             ]);
     }
@@ -68,43 +82,18 @@ class ServiceProviderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
+                    ->translateLabel()
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('birth_date')
-                    ->date()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('service_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('address')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('city')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('state')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('zip')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('document')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('bank_account')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->searchable(),
+
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -114,6 +103,7 @@ class ServiceProviderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

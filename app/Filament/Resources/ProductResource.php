@@ -22,25 +22,33 @@ class ProductResource extends Resource
     protected static ?string $model = Product::class;
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static ?string $navigationLabel = 'Servicios';
+
     protected static ?string $navigationGroup = 'Menu';
     protected static ?int $navigationSort = 7;
+
+    public static function getModelLabel(): string
+    {
+        return __('Service');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('category_id')
-                    ->label('Categoria')
+                    ->label('Category')
+                    ->translateLabel()
                     ->relationship('category', 'name')
                     ->searchable()
                     ->preload()
                     ->required()
                     ->createOptionForm([
                         TextInput::make('name')
-                            ->label('Categoria Nombre')
+                            ->label('Category name')
+                            ->translateLabel()
                             ->required(),
                         RichEditor::make('description')
+                            ->translateLabel()
                             ->label('Categoria Descripción'),
                     ])
                     ->createOptionUsing(function (array $data): int {
@@ -53,25 +61,26 @@ class ProductResource extends Resource
                     }),
 
                 Forms\Components\TextInput::make('code')
-                    ->label('Codigo')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(20),
                 Forms\Components\TextInput::make('name')
-                    ->label('Nombre')
+                    ->translateLabel()
                     ->required()
                     ->maxLength(255)
                     ->columnSpan(2),
                 Forms\Components\MarkdownEditor::make('description')
-                    ->label('Descripción')
+                    ->translateLabel()
                     ->columnSpan(2),
                 Forms\Components\TextInput::make('price')
-                    ->label('Precio')
+                    ->translateLabel()
                     ->required()
                     ->numeric()
                     ->rules('numeric|min:0'),
 
                 Forms\Components\Select::make('product_type')
-                    ->label('Tipo')
+                    ->label('Type')
+                    ->translateLabel()
                     ->options([
                         ProductType::METROS->value => 'Metros',
                         ProductType::CENTIMETROS->value => 'Centímetros',
@@ -89,11 +98,11 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('price')->sortable(),
-                Tables\Columns\TextColumn::make('product_type'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime(),
+                Tables\Columns\TextColumn::make('code') ->translateLabel()->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('name') ->translateLabel()->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('price') ->translateLabel()->sortable(),
+                Tables\Columns\TextColumn::make('product_type') ->translateLabel(),
+                Tables\Columns\TextColumn::make('created_at') ->translateLabel()->dateTime(),
             ])
             ->filters([
                 //

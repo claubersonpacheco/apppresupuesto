@@ -17,21 +17,26 @@ use Illuminate\Support\Facades\Storage;
 
 class UserResource extends Resource
 {
+
     protected static ?string $model = User::class;
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationLabel = 'Usuarios';
-    protected static ?string $breadcrumb = 'Usuarios';
+
     protected static ?string $navigationGroup = 'Administración';
 
     protected static ?int $navigationSort = 11;
+
+    public static function getModelLabel(): string
+    {
+        return __('User');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->translateLabel()
+                    ->translateLabel(__('name'))
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
