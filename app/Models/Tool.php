@@ -21,7 +21,7 @@ class Tool extends Model
         'condition',
         'purchase_date',
         'purchase_price',
-        'storage_location',
+        'invoice',
         'notes',
         'photo_path',
     ];

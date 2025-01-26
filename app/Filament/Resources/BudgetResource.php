@@ -94,9 +94,8 @@ class BudgetResource extends Resource
 
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created')
                     ->translateLabel()
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

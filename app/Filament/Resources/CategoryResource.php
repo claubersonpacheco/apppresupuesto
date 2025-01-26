@@ -46,8 +46,11 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->translateLabel(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d/m/Y H:i:s')->translateLabel(),
+                Tables\Columns\TextColumn::make('name')
+                    ->translateLabel(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->translateLabel(),
             ])
             ->filters([
                 //

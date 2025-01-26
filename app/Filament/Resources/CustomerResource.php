@@ -64,7 +64,9 @@ class CustomerResource extends Resource
                 Tables\Columns\TextColumn::make('name')->translateLabel()->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->translateLabel()->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('phone')->translateLabel()->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('created_at')->translateLabel()->dateTime(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->translateLabel(),
             ])
             ->filters([
                 //

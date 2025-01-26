@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('condition', 20);
             $table->date('purchase_date');
             $table->decimal('purchase_price', 10, 2)->nullable();
-            $table->string('storage_location', 50)->nullable();
+            $table->string('invoice')->nullable(); // Caminho da foto
             $table->text('notes')->nullable();
             $table->string('photo_path')->nullable(); // Caminho da foto
             $table->timestamps();

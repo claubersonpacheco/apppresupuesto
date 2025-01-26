@@ -102,7 +102,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('name') ->translateLabel()->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('price') ->translateLabel()->sortable(),
                 Tables\Columns\TextColumn::make('product_type') ->translateLabel(),
-                Tables\Columns\TextColumn::make('created_at') ->translateLabel()->dateTime(),
+                Tables\Columns\TextColumn::make('created_at') ->translateLabel()->dateTime('d/m/Y H:i:s'),
             ])
             ->filters([
                 //

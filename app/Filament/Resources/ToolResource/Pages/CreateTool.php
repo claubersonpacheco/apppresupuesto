@@ -35,7 +35,15 @@ class CreateTool extends CreateRecord
                 Select::make('category_id')
                     ->translateLabel()
                     ->relationship('category', 'name')
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        TextInput::make('name')
+                            ->translateLabel()
+                            ->required(),
+                        RichEditor::make('description')
+                            ->translateLabel()
+                            ->columnSpanFull(),
+                    ]),
                 TextInput::make('brand')
                     ->translateLabel()
                     ->required()
@@ -56,9 +64,13 @@ class CreateTool extends CreateRecord
                 TextInput::make('purchase_price')
                     ->translateLabel()
                     ->numeric(),
-                TextInput::make('storage_location')
+                FileUpload::make('invoice')
                     ->translateLabel()
-                    ->maxLength(50),
+                    ->image()
+                    ->directory('tools/invoices')
+                    ->imageEditor()
+                    ->maxSize(1024) // Tamanho máximo em KB
+                    ->nullable(),
                 RichEditor::make('notes')
                     ->translateLabel()
                     ->columnSpanFull(),
@@ -66,7 +78,7 @@ class CreateTool extends CreateRecord
                     ->label("Photo")
                     ->translateLabel()
                     ->image()
-                    ->directory('images')
+                    ->directory('tools/images')
                     ->imageEditor()
                     ->maxSize(1024) // Tamanho máximo em KB
                     ->nullable(),

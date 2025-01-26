@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class UserResource extends Resource
@@ -35,15 +36,23 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('code')
+                    ->translateLabel(__('code'))
+                    ->required()
+                    ->disabled()
+                    ->maxLength(255),
+
                 Forms\Components\TextInput::make('name')
                     ->translateLabel(__('name'))
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpan(2),
                 Forms\Components\TextInput::make('email')
                     ->required()
                     ->email()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(50),
+                    ->maxLength(50)
+                    ->columnSpan(2),
                 Forms\Components\TextInput::make('password')
                     ->translateLabel()
                     ->password()
@@ -80,13 +89,14 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
 
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d/m/y'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime('d/m/Y H:i:s'),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

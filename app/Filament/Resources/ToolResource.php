@@ -6,6 +6,10 @@ use App\Filament\Resources\ToolResource\Pages;
 use App\Filament\Resources\ToolResource\RelationManagers;
 use App\Models\Tool;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -42,10 +46,18 @@ class ToolResource extends Resource
                     ->translateLabel()
                     ->required()
                     ->maxLength(100),
-                Forms\Components\Select::make('category_id')
+                Select::make('category_id')
                     ->translateLabel()
                     ->relationship('category', 'name')
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->translateLabel()
+                            ->required(),
+                        Forms\Components\RichEditor::make('description')
+                            ->translateLabel()
+                            ->columnSpanFull(),
+                    ]),
                 Forms\Components\TextInput::make('brand')
                     ->translateLabel()
                     ->required()
@@ -66,17 +78,21 @@ class ToolResource extends Resource
                 Forms\Components\TextInput::make('purchase_price')
                     ->translateLabel()
                     ->numeric(),
-                Forms\Components\TextInput::make('storage_location')
+                FileUpload::make('invoice')
                     ->translateLabel()
-                    ->maxLength(50),
-                Forms\Components\RichEditor::make('notes')
+                    ->image()
+                    ->directory('tools/invoices')
+                    ->imageEditor()
+                    ->maxSize(1024) // Tamanho máximo em KB
+                    ->nullable(),
+                RichEditor::make('notes')
                     ->translateLabel()
                     ->columnSpanFull(),
-                Forms\Components\FileUpload::make('photo_path')
+                FileUpload::make('photo_path')
                     ->label("Photo")
                     ->translateLabel()
                     ->image()
-                    ->directory('images')
+                    ->directory('tools/images')
                     ->imageEditor()
                     ->maxSize(1024) // Tamanho máximo em KB
                     ->nullable(),
@@ -88,24 +104,22 @@ class ToolResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('category.name')
+                    ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('brand')
+                    ->translateLabel()
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('purchase_date')
-                    ->date()
+                    ->translateLabel()
+                    ->dateTime('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('purchase_price')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('photo_path')
-                    ->disk('public')
-                    ->url(fn ($record) => Storage::url($record->photo_path)),
-
             ])
             ->filters([
                 //
