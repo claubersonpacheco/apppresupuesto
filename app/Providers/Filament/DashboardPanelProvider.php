@@ -90,9 +90,7 @@ class DashboardPanelProvider extends PanelProvider
                     ->useBuildDirectory('build/')
                     ->withEntryPoints(['resources/js/app.js', 'resources/css/app.css'])
                     ->toHtml();
-            })
-            ->plugin(SpatieLaravelTranslatablePlugin::make()
-                ->defaultLocales(['en', 'es']));
+            });
     }
 
 

@@ -28,6 +28,13 @@ class ItemsBudget extends Page
     {
         return [
 
+            Action::make(__('Send Email'))
+                ->url(route('budget.email', $this->record))
+                ->icon('heroicon-o-printer')
+                ->color('warning')
+                ->openUrlInNewTab(),
+
+
             Action::make(__('Print'))
                 ->url(route('budget.print', $this->record))
                 ->icon('heroicon-o-printer')

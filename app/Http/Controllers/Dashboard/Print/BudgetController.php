@@ -3,10 +3,18 @@
 namespace App\Http\Controllers\Dashboard\Print;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SendBudget;
 use App\Models\Budget;
 
+use App\Models\SendEmail;
 use App\Models\Setting;
+use App\Models\User;
+use Carbon\Carbon;
+use Filament\Notifications\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Facades\Pdf;
@@ -25,6 +33,7 @@ class BudgetController extends Controller
             ->first();
 
         $pdfName = $budget->code.'.pdf';
+
         $storagePath = storage_path('app/reports/'.$pdfName);
 
         $setting = Setting::first();
@@ -100,5 +109,62 @@ class BudgetController extends Controller
 
 
     }
+
+
+    public function sendEmail($id)
+    {
+        $budget = Budget::where('id', $id)
+            ->with(['items' => function ($query) {
+                $query->orderBy('sort_order', 'asc');
+            }])
+            ->first();
+
+        $pdfName = Date('dmY').$budget->code . '.pdf';
+        $storagePath = storage_path('app/reports/' . $pdfName);
+
+        $setting = Setting::first();
+
+        $template = view('print.budget.items-budget', compact('budget', 'setting'))->render();
+
+        Browsershot::html($template)
+            ->setNodeBinary('/usr/bin/node')
+            ->setNpmBinary('/usr/bin/npm')
+            ->setOption('args', ['--no-sandbox'])
+            ->setOption('executablePath', '/home/sail/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome')
+            ->emulateMedia('screen')
+            ->showBackground()
+            ->showBrowserHeaderAndFooter()
+            ->hideHeader()
+            ->footerHtml($this->getFooterHtml($budget))
+            ->setOption('pageRanges', '1-')
+            ->format('A4')
+            ->timeout(120)
+            ->waitUntilNetworkIdle()
+            ->ignoreHttpsErrors()
+            ->savePdf($storagePath);
+
+        if (!file_exists($storagePath)) {
+            abort(404, 'File not found.');
+        }
+
+        // Enviar o e-mail com o PDF em anexo
+        $emailData = [
+            'name' => $budget->customer_name,
+            'code' => $budget->code,
+            'total' => $budget->total,
+            'budget' => $budget->name,
+            'logo_impress' => $setting->logo_impress,
+            'title' => $setting->title,
+            'email' =>  $setting->email,
+            'whatsapp' => $setting->whatsapp
+        ];
+
+        $pdfContent = file_get_contents($storagePath);
+
+        Mail::to($budget->customer->email)->send(new SendBudget($emailData, $pdfContent, $pdfName ));
+
+        return back()->with('success', 'Email successfully sent.');
+    }
+
 
 }

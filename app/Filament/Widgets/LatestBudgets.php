@@ -35,6 +35,7 @@ class LatestBudgets extends BaseWidget
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('latestStatus.status_label')
+                    ->badge()
                     ->label('Status')
                     ->color(fn ($state, $record) => match ($record->latestStatus?->status) {
                         1 => 'primary',    // Aberto
