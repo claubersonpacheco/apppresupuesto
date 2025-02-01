@@ -19,7 +19,7 @@ class ProductSupplierResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
     public static function getModelLabel(): string
     {
-        return __('Fornecedores');
+        return __('Product Supplier');
     }
 
     protected static ?string $navigationGroup = 'Menu';

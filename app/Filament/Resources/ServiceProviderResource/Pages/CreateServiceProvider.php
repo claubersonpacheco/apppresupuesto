@@ -17,8 +17,6 @@ class CreateServiceProvider extends CreateRecord
 
     use GeneratesAutomaticCode;
 
-    protected static ?string $title = 'Prestador de Servícios';
-
     public function form(Form $form): Form
     {
         return $form

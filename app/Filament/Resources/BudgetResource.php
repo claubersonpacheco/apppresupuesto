@@ -41,6 +41,7 @@ class BudgetResource extends Resource
                     ->label('Client')
                     ->translateLabel()
                     ->relationship('customer', 'name')
+                    ->searchable()
                     ->disabled(),
 
 

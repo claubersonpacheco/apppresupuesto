@@ -44,7 +44,7 @@ class BudgetController extends Controller
             ->setNodeBinary('/usr/bin/node')
             ->setNpmBinary('/usr/bin/npm')
             ->setOption('args', ['--no-sandbox'])
-            ->setOption('executablePath', '/home/sail/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome') // Defina o caminho correto para o Chrome
+            ->setOption('executablePath', '/home/sail/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome') // '/usr/bin/google-chrome' Defina o caminho correto para o Chrome
             ->emulateMedia('screen')
             ->showBackground()
             ->showBrowserHeaderAndFooter()
@@ -130,7 +130,7 @@ class BudgetController extends Controller
             ->setNodeBinary('/usr/bin/node')
             ->setNpmBinary('/usr/bin/npm')
             ->setOption('args', ['--no-sandbox'])
-            ->setOption('executablePath', '/home/sail/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome')
+            ->setOption('executablePath', '/home/sail/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome') //'/usr/bin/google-chrome'
             ->emulateMedia('screen')
             ->showBackground()
             ->showBrowserHeaderAndFooter()

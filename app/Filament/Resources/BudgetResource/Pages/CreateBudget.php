@@ -52,7 +52,9 @@ class CreateBudget extends CreateRecord
                             ->translateLabel()
                             ->required()
                             ->maxLength(255),
-                    ]),
+                    ])
+                    ->searchable()
+                    ->preload(),
 
                 TextInput::make('name')
                     ->translateLabel()

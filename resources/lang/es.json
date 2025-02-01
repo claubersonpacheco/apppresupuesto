@@ -231,7 +231,7 @@
     "Email": "Correo Eletronico",
     "Description" : "Descripción",
     "Customer": "Cliente",
-    "Product supplier": "Fornecedor",
+    "Product Supplier": "Fornecedor",
     "Budget": "Presupuesto",
     "Service Provider": "Prestador de Servício",
     "Back": "Volver",
@@ -279,7 +279,15 @@
     "Total Tax": "Total c/IVA",
     "Observation Footer": "Observación Rodapie",
     "Observation": "Observación",
-    "Send Email": "Enviar Correo"
+    "Send Email": "Enviar Correo",
+    "New Customer" : "Nuevo Cliente",
+    "New Service" : "Nuevo Servicio",
+    "New Category" : "Nueva Categoria",
+    "New User" : "Nuevo Usuario",
+    "New Tool" : "Nueva Herramienta",
+    "New Category Tool" : "Nueva Categoria de Herramienta",
+    "New Service Provider" : "Nuevo Prestador de Servicio",
+    "New Supplier" : "Nuevo Fornecedor"
 
 
 }
