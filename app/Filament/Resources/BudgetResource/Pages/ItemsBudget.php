@@ -35,15 +35,16 @@ class ItemsBudget extends Page
                 ->openUrlInNewTab(),
 
 
-            Action::make(__('Print'))
-                ->url(route('budget.print', $this->record))
-                ->icon('heroicon-o-printer')
-                ->color('danger')
-                ->openUrlInNewTab(),
-            Action::make('PDF')
+
+            Action::make('Descargar PDF')
             ->url(route('budget.pdf', $this->record))
                 ->icon('heroicon-o-document-text')
                 ->color('success'),
+            Action::make(__('Previsualizar'))
+                ->url(route('budget.print', $this->record))
+                ->icon('heroicon-o-eye')
+                ->color('danger')
+                ->openUrlInNewTab(),
             Action::make(__('Back'))
                 ->url('/dashboard/budgets')
                 ->icon('heroicon-o-arrow-uturn-left'),
