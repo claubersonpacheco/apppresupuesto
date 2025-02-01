@@ -374,6 +374,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
+
                                     ->afterStateUpdated(function (callable $set, $state) {
                                         $product = Product::find($state);
                                         if ($product) {
