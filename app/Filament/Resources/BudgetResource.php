@@ -52,7 +52,7 @@ class BudgetResource extends Resource
                     ->columnSpan('full'),
 
                 Forms\Components\RichEditor::make('description')
-                    ->label('Description')
+                    ->label('Observation Footer')
                     ->translateLabel()
                     ->maxLength(255)
                     ->columnSpan('full'),

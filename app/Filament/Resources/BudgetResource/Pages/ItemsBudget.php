@@ -30,7 +30,7 @@ class ItemsBudget extends Page
 
             Action::make(__('Send Email'))
                 ->url(route('budget.email', $this->record))
-                ->icon('heroicon-o-printer')
+                ->icon('heroicon-o-envelope')
                 ->color('warning')
                 ->openUrlInNewTab(),
 
@@ -38,7 +38,7 @@ class ItemsBudget extends Page
             Action::make(__('Print'))
                 ->url(route('budget.print', $this->record))
                 ->icon('heroicon-o-printer')
-                ->color('warning')
+                ->color('danger')
                 ->openUrlInNewTab(),
             Action::make('PDF')
             ->url(route('budget.pdf', $this->record))

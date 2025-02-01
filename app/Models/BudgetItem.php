@@ -10,7 +10,15 @@ class BudgetItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['budget_id', 'product_id', 'quantity', 'price', 'tax', 'description', 'total', 'total_tax'];
+    protected $guarded;
+
+    protected $casts = [
+        'price' => 'float',
+        'quantity' => 'integer',
+        'tax' => 'integer',
+        'total' => 'float',
+        'total_tax' => 'float',
+    ];
 
     public function budget():BelongsTo
     {

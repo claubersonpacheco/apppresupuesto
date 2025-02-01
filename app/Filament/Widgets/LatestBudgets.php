@@ -7,6 +7,7 @@ use App\Models\Budget;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Livewire\Attributes\Title;
 
 class LatestBudgets extends BaseWidget
 {
@@ -14,9 +15,11 @@ class LatestBudgets extends BaseWidget
 
     protected int | string | array $columnSpan = 'full';
 
+
     public function table(Table $table): Table
     {
         return $table
+            ->heading(__('Latest Budgets'))
             ->query(
                 BudgetResource::getEloquentQuery()
             )
@@ -27,7 +30,8 @@ class LatestBudgets extends BaseWidget
                     ->translateLabel()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Servicio')
+                    ->label('Service')
+                    ->translateLabel()
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('customer.name')
@@ -52,13 +56,14 @@ class LatestBudgets extends BaseWidget
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->translateLabel()
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
 
             ])
             ->actions([
                 Tables\Actions\Action::make('manage_items')
-                    ->label('Servicios')
+                    ->label('Services')
+                    ->translateLabel()
                     ->url(fn (Budget $record): string => "/dashboard/budgets/{$record->getKey()}/items")
                     ->icon('heroicon-o-cog'), // Adicione um ícone apropriado
                 Tables\Actions\EditAction::make(),

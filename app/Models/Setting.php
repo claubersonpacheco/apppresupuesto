@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    use HasFactory;
+
+    protected $table = 'settings';
 
     protected $guarded;
 
@@ -23,4 +23,5 @@ class Setting extends Model
         // Retorne um valor padrão caso não encontre
         return 'FS';
     }
+
 }

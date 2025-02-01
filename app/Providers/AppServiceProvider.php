@@ -4,8 +4,6 @@ namespace App\Providers;
 
 use App\Models\Budget;
 use App\Models\BudgetItem;
-use App\Observers\BudgetItemObserver;
-use App\Observers\BudgetObserver;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,8 +25,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Budget::observe(BudgetObserver::class);
-        BudgetItem::observe(BudgetItemObserver::class);
 
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch

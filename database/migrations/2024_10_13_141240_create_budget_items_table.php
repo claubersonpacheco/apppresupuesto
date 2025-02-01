@@ -13,19 +13,18 @@ return new class extends Migration
     {
         Schema::create('budget_items', function (Blueprint $table) {
             $table->id();
-
             $table->integer('sort_order')->default(0);
             $table->foreignId('budget_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->text('description')->nullable();
             $table->integer('quantity');
+            $table->integer('tax')->default(0);
             $table->decimal('price', 10, 2)->default(0);
-            $table->string('tax', 2)->default(0);
-            $table->decimal('total', 10, 2)->default(0); // 10 dígitos no total, 2 após o ponto decimal
+            $table->decimal('total', 10, 2)->default(0);
             $table->decimal('total_tax', 10, 2)->default(0);
-
             $table->timestamps();
         });
+
     }
 
     /**

@@ -275,23 +275,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
         }
     }
 
-    public function updateBudgetTotal()
-    {
-        $budget = Budget::find($this->budgetId);
-
-        if ($budget) {
-            $budgetTotal = $budget->items()->sum('total'); // Sumando los totales de los itens
-            $budgetTotalTax = $budget->items()->sum('total_tax');
-            $budgetTax = $budgetTotalTax - $budgetTotal;
-
-            $budget->update([
-                'total' => $budgetTotal,
-                'total_tax' => $budgetTotalTax,
-                'tax' => $budgetTax,
-            ]); // Atualizando o total do orçamento
-        }
-    }
-
     public function updateVisibleColumns()
     {
         $this->visibleColumns = [
@@ -327,6 +310,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
         $this->dispatch('refreshInfolist');
     }
 
+
     // aqui busco los datos para inserir en la tabla
     public function table(Table $table): Table
     {
@@ -340,25 +324,34 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
             ->columns([
                 TextColumn::make('product.name')->label(__('Servicio'))
                     ->hidden(fn() => !$this->visibleColumns['service']),
+
                 TextColumn::make('description')->label(__('Descripción'))
                     ->hidden(fn() => !$this->visibleColumns['description'])
                     ->html() // Permite renderizar HTML na coluna
                     ->wrap(),
+
                 TextColumn::make('quantity')->label(__('Cant'))
-                    ->hidden(fn() => !$this->visibleColumns['qtd']),
-                TextColumn::make('price')->label(__('Unid Precio'))
-                    ->hidden(fn() => !$this->visibleColumns['price']),
+                    ->hidden(fn() => !$this->visibleColumns['qtd'])
+                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
+
+                TextColumn::make('price')->label(__('Unid Precio'))->money('EUR')
+                    ->hidden(fn() => !$this->visibleColumns['price'])
+                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
                 TextColumn::make('tax')->label('Iva %')
-                    ->hidden(fn() => !$this->visibleColumns['tax']),
+                    ->hidden(fn() => !$this->visibleColumns['tax'])
+                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
-                TextColumn::make('total')->label('Valor s/Iva')
-                    ->hidden(fn() => !$this->visibleColumns['total']),
+                TextColumn::make('total')->label('Valor s/Iva')->money('EUR')
+                    ->hidden(fn() => !$this->visibleColumns['total'])
+                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
-                TextColumn::make('total_tax')->label('Valor c/Iva')
-                    ->hidden(fn() => !$this->visibleColumns['total_tax']),
+                TextColumn::make('total_tax')->label('Valor c/Iva')->money('EUR')
+                    ->hidden(fn() => !$this->visibleColumns['total_tax'])
+                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
             ])
+            ->recordClasses(fn ($record) => ($record->total == 0 && $record->total_tax == 0 && $record->quantity == 0) ? 'bg-gray-200 text-gray-200 ' : '')
             ->reorderable('sort_order') // Ativa o recurso de arrastar e soltar
             ->filters([
                 //
@@ -378,12 +371,18 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->label(__('Service'))
                                     ->options(Product::all()->pluck('name', 'id'))
                                     ->required()
+                                    ->searchable()
+                                    ->preload()
                                     ->reactive()
                                     ->afterStateUpdated(function (callable $set, $state) {
                                         $product = Product::find($state);
                                         if ($product) {
-                                            $set('price', $product->price ?? 0);
-                                            $set('description', $product->description ?? ''); // Define a descrição inicial
+                                            $set('quantity', '1');
+                                            $set('price', $product->price ?? 0.00);
+                                            $set('description', $product->description ?? '');
+                                            $set('total', $product->price ?? 0.00);
+                                            $tax = (int)$product->tax / 100;
+                                            $set('total_tax', $product->price + ($product->price * $tax));
                                         }
                                     })
                                     ->columns(1),
@@ -391,15 +390,12 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 TextInput::make('quantity')
                                     ->label(__('Quantity'))
                                     ->numeric()
-                                    ->rules('numeric|min:0')
+                                    ->rules('numeric')
                                     ->required()
                                     ->reactive()
+                                    ->default('0')
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
-                                        if ($state < 0) {
-                                            $set('quantity', 0); // Define como 0 se for negativo
-                                            return; // Sai da execução
-                                        }
-
+                                        if (!$get('product_id')) return;
                                         $total = $get('price') * $state;
                                         $set('total', $total);
                                         $tax = (int)$get('tax') / 100;
@@ -407,13 +403,13 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     }),
 
                                 TextInput::make('price')
-                                    ->label(__('Price Unit'))
-                                    ->rules('numeric|min:0')
+                                    ->label('Price Unit')
+                                    ->translateLabel()
+                                    ->rules('numeric')
                                     ->required()
                                     ->numeric()
-                                    ->rules('numeric|min:0')
                                     ->reactive()
-                                    ->default(fn($get) => $get('product_id') ? Product::find($get('product_id'))->price : null)
+                                    ->default(fn($get) => $get('product_id') ? Product::find($get('product_id'))->price : '0.00')
                                     ->afterStateHydrated(function (callable $set, $state, $get) {
                                         if ($get('product_id')) {
                                             $product = Product::find($get('product_id'));
@@ -423,10 +419,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         }
                                     })
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
-                                        if ($state < 0) {
-                                            $set('price', 0); // Define como 0 se for negativo
-                                            return; // Sai da execução
-                                        }
+
                                         $total = $state * $get('quantity');
                                         $set('total', $total);
                                         $tax = (int)$get('tax') / 100;
@@ -452,19 +445,20 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->columns(1),
 
                                 RichEditor::make('description')
-                                    ->label('Descripción del servicio')
+                                    ->translateLabel()
                                     ->reactive()
                                     ->columnSpan(4),
 
                                 TextInput::make('total')
-                                    ->label('Total s/Iva')
-                                    ->disabled()
-                                    ->required(),
+                                    ->translateLabel()
+                                    ->default( '0.00')
+                                    ->readOnly(),
 
                                 TextInput::make('total_tax')
-                                    ->label('Total c/Iva')
-                                    ->disabled()
-                                    ->required(),
+                                    ->label('Total Tax')
+                                    ->translateLabel()
+                                    ->default( '0.00')
+                                    ->readOnly(),
                             ])
                     ])
                     ->after(function () {
@@ -484,58 +478,41 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->required(),
 
                                 Select::make('product_id')
-                                    ->label('Produto')
+                                    ->label('Service')
+                                    ->translateLabel()
                                     ->options(Product::all()->pluck('name', 'id'))
                                     ->required()
                                     ->reactive()
-                                    ->afterStateUpdated(fn(callable $set, $state) => $set('price', Product::find($state)->price))
+                                    ->searchable()
+                                    ->preload()
                                     ->columns(1),
 
-
                                 TextInput::make('quantity')
-                                    ->label('Quantidade')
+                                    ->translateLabel()
                                     ->numeric()
                                     ->required()
                                     ->reactive()
+                                    ->lazy(0.5)
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
-
-                                        if ($state < 0) {
-                                            $set('quantity', 0); // Define como 0 se for negativo
-                                            return; // Sai da execução
-                                        }
-
-                                        $total = $get('price') * $state;
-                                        $set('total', $total);
+                                        $total = $get('price') * $state; // Atualizando 'total' com base na 'price' e 'quantity'
+                                        $set('total', $total); // Setando o valor no campo 'total'
                                         $tax = (int)$get('tax') / 100;
-                                        $set('total_tax', $total + ($total * $tax));
+                                        $set('total_tax', $total + ($total * $tax)); // Calculando o 'total_tax'
+
                                     }),
 
                                 TextInput::make('price')
-                                    ->label('Preço Unitário')
+                                    ->translateLabel()
                                     ->required()
                                     ->numeric()
-                                    ->rules('numeric|min:0')
                                     ->reactive()
-                                    ->default(fn($get) => $get('product_id') ? Product::find($get('product_id'))->price : null)
-                                    ->afterStateHydrated(function (callable $set, $state, $get) {
-                                        if ($get('product_id')) {
-                                            $product = Product::find($get('product_id'));
-                                            if ($product) {
-                                                $set('price', $product->price);
-                                            }
-                                        }
-                                    })
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
-                                        if ($state < 0) {
-                                            $set('price', 0); // Define como 0 se for negativo
-                                            return; // Sai da execução
-                                        }
                                         $total = $state * $get('quantity');
                                         $set('total', $total);
                                         $tax = (int)$get('tax') / 100;
                                         $set('total_tax', $total + ($total * $tax));
-                                    }),
 
+                                    }),
 
                                 Select::make('tax')
                                     ->label('IVA')
@@ -548,33 +525,32 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ])
                                     ->reactive()
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
-                                        $total = $get('total');
+                                        $total = $get('total');  // Certifique-se de pegar o valor de 'total' aqui
                                         $tax = (int)$state / 100;
                                         $set('total_tax', $total + ($total * $tax));
-                                    })
-                                    ->columns(1),
+                                    }),
+
                                 RichEditor::make('description')
-                                    ->label('Descripción del servicio')
+                                    ->translateLabel()
                                     ->reactive()
                                     ->columnSpan(4),
 
                                 TextInput::make('total')
                                     ->label('Total s/Iva')
-                                    ->disabled()
-                                    ->required(),
+                                    ->readOnly(),
 
                                 TextInput::make('total_tax')
                                     ->label('Total c/Iva')
-                                    ->disabled()
-                                    ->required(),
+                                    ->readOnly(),
                             ])
-
                     ])
                     ->after(function () {
-                        $this->updateBudgetTotal(); // Recalcula o total após criar o item
+                        $this->updateBudgetTotal();
                         $this->dispatch('refreshInfolist');
+                    })
+                    ->modalHeading(__('Edit Service')),
 
-                    }),
+
                 DeleteAction::make()
                     ->after(function () {
                         // Recalcule o total após a exclusão
@@ -588,7 +564,23 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                 ]),
             ]);
     }
+    public function updateBudgetTotal()
+    {
+        $budget = Budget::find($this->budgetId);
 
+        if ($budget) {
+
+            $budgetTotal = $budget->items()->sum('total'); // Sumando los totales de los itens
+            $budgetTotalTax = $budget->items()->sum('total_tax');
+            $budgetTax = $budgetTotalTax - $budgetTotal;
+
+            $budget->update([
+                'total' => $budgetTotal,
+                'total_tax' => $budgetTotalTax,
+                'tax' => $budgetTax,
+            ]); // Atualizando o total do orçamento
+        }
+    }
 
     #[On('refreshInfolist')]
     public function productInfolist(Infolist $infolist): Infolist
@@ -608,13 +600,15 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                             ->schema([
                                 TextEntry::make('description')
                                     ->markdown()
-                                    ->label('Observación')
+                                    ->label('Observation')
+                                ->translateLabel()
                             ])->columnSpan(1),
 
                         Section::make()
                             ->schema([
                                 TextEntry::make('tax')
                                     ->label('Total IVA')
+                                    ->money('EUR')
                                     ->hidden(fn() => !$this->visibleColumns['total_tax']),
 
                             ])->columnSpan(1),
@@ -623,10 +617,12 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                             ->schema([
                                 TextEntry::make('total')
                                     ->label('Total Sin IVA')
+                                    ->money('EUR')
                                     ->hidden(fn() => !$this->visibleColumns['total']),
 
                                 TextEntry::make('total_tax')
                                     ->label('Total c/ IVA')
+                                    ->money('EUR')
                                     ->hidden(fn() => !$this->visibleColumns['total_tax']),
                             ])->columnSpan(1),
 

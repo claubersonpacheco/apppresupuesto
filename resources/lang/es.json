@@ -273,6 +273,16 @@
     "Postal code" : "Código Postal",
     "Send email" : "Correio de envio",
     "Dashboard": "Escritorio",
-    "Invoice": "Factura"
+    "Invoice": "Factura",
+    "Quantity": "Cantidad",
+    "Price Unit": "Precio Unid",
+    "Latest Budgets": "Últimos Presupuestos",
+    "Services" : "Servicios",
+    "Edit Service" : "Editar Servicio",
+    "Total Tax": "Total c/IVA",
+    "Observation Footer": "Observación Rodapie",
+    "Observation": "Observación",
+    "Send Email": "Enviar Correo"
+
 
 }
