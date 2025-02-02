@@ -35,7 +35,7 @@ class SendBudget extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Presupuesto ' . env('APP_NAME'),
+            subject: $this->data['subject'],
         );
     }
 

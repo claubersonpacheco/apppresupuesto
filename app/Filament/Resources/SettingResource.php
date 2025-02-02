@@ -77,6 +77,7 @@ class SettingResource extends Resource
                     ->maxLength(255),
 
                 Forms\Components\TextInput::make('send_email')
+                    ->label('Email Send')
                     ->translateLabel()
                     ->email()
                     ->maxLength(255),

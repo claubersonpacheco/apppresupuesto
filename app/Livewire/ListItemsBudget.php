@@ -47,8 +47,6 @@ use Filament\Tables\Columns\Concerns\CanBeToggled;
 use Illuminate\Support\Facades\Log;
 
 
-
-
 class ListItemsBudget extends Component implements HasTable, HasForms, HasInfolists
 {
     use InteractsWithTable;
@@ -62,7 +60,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
     public $visibleColumns = [];
 
-    public $service, $qtd, $price, $description , $tax , $total ,$total_tax;
+    public $service, $qtd, $price, $description, $tax, $total, $total_tax;
 
     public function mount($record)
     {
@@ -96,7 +94,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
     }
 
 
-
     public function headertInfolist(Infolist $infolist): Infolist
     {
         $this->budget = Budget::with(['customer', 'latestStatus'])->findOrFail($this->budgetId);
@@ -104,150 +101,142 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
         return $infolist
             ->record($this->budget)
             ->schema([
-                \Filament\Infolists\Components\Grid::make(3) // Grid principal com três colunas
-                ->schema([
-                    // Primeira Coluna: Cliente
-                    Fieldset::make('Cliente')
-                        ->schema([
-                            TextEntry::make('customer.code')
-                                ->label('Código del Cliente:')
-                                ->suffixAction(
-                                    Action::make('copiar')
-                                        ->icon('heroicon-m-clipboard')
+                \Filament\Infolists\Components\Grid::make(3)
+                    ->schema([
+                        // Primeira Coluna: Cliente
+                        Fieldset::make('Cliente')
+                            ->schema([
+                                TextEntry::make('customer.code')
+                                    ->label('Código del Cliente:')
+                                    ->suffixAction(
+                                        Action::make('copiar')
+                                            ->icon('heroicon-m-clipboard')
+                                            ->action(function ($record) {
+                                                $this->dispatch('clipboard:copied', $record->code);
+                                            })
+                                    ),
 
-                                        ->action(function ($record) {
-                                            $this->dispatch('clipboard:copied', $record->code);
-                                        })
-                                ),
 
+                                TextEntry::make('created_at')
+                                    ->label('Fecha Presupuesto:')
+                                    ->date('d/m/y'),
+                                TextEntry::make('customer.name')
+                                    ->label('Nombre:')
+                                    ->extraAttributes(['class' => 'border-b'])
+                                    ->suffixAction(
+                                        Action::make('copiar')
+                                            ->icon('heroicon-m-clipboard')
+                                            ->action(function ($record) {
+                                                $this->dispatch('clipboard:copied', $record->customer->name);
+                                            })
+                                    ),
+                                TextEntry::make('customer.document')
+                                    ->label('Dni/Nif:')
+                                    ->extraAttributes(['class' => 'border-b'])
+                                    ->suffixAction(
+                                        Action::make('copiar')
+                                            ->icon('heroicon-m-clipboard')
+                                            ->action(function ($record) {
+                                                $this->dispatch('clipboard:copied', $record->customer->document);
+                                            })
+                                    ),
 
-                            TextEntry::make('created_at')
-                                ->label('Fecha Presupuesto:')
-                                ->date('d/m/y'),
-                            TextEntry::make('customer.name')
-                                ->label('Nombre:')
-                                ->extraAttributes(['class' => 'border-b'])
-                                ->suffixAction(
-                                    Action::make('copiar')
-                                        ->icon('heroicon-m-clipboard')
+                                TextEntry::make('customer.email')
+                                    ->label('Correo Eletronico:')
+                                    ->suffixAction(
+                                        Action::make('copiar')
+                                            ->icon('heroicon-m-clipboard')
+                                            ->action(function ($record) {
+                                                $this->dispatch('clipboard:copied', $record->customer->email);
+                                            })
+                                    )
+                                    ->extraAttributes(['class' => 'border-b']),
+                                TextEntry::make('customer.phone')
+                                    ->label('Teléfono:')
+                                    ->suffixAction(
+                                        Action::make('copiar')
+                                            ->icon('heroicon-m-clipboard')
+                                            ->action(function ($record) {
+                                                $this->dispatch('clipboard:copied', $record->customer->phone);
+                                            })
+                                    )
+                                    ->extraAttributes(['class' => 'border-b']),
+                                TextEntry::make('customer.address')
+                                    ->label('Direccion:')
+                                    ->suffixAction(
+                                        Action::make('copiar')
+                                            ->icon('heroicon-m-clipboard')
+                                            ->action(function ($record) {
+                                                $this->dispatch('clipboard:copied', $record->customer->address);
+                                            })
+                                    )
+                                    ->extraAttributes(['class' => 'border-b']),
+                            ])
+                            ->extraAttributes(['class' => 'bg-white p-4 dark:bg-gray-900 dark:text-white border'])
+                            ->columnSpan(2), // Coluna 1 do Grid
 
-                                        ->action(function ($record) {
-                                            $this->dispatch('clipboard:copied', $record->customer->name);
-                                        })
-                                ),
-                            TextEntry::make('customer.document')
-                                ->label('Dni/Nif:')
-                                ->extraAttributes(['class' => 'border-b'])
-                                ->suffixAction(
-                                    Action::make('copiar')
-                                        ->icon('heroicon-m-clipboard')
+                        Fieldset::make('Status')
+                            ->schema([
+                                TextEntry::make('status')
+                                    ->label('Status')
+                                    ->columnSpanFull()
+                                    ->getStateUsing(function ($record) {
+                                        if ($record->latestStatus) {
+                                            $statusOptions = StatusHistory::getStatusOptions();
+                                            return $statusOptions[$record->latestStatus->status] ?? 'Status desconhecido';
+                                        }
+                                        return 'Status desconhecido';
+                                    })
+                                    ->suffixAction(
+                                        Action::make('alterarStatus')
+                                            ->form([
+                                                Select::make('status_id')
+                                                    ->label('Novo Status')
+                                                    ->options(StatusHistory::getStatusOptions())
+                                                    ->required(),
+                                                Textarea::make('comments')
+                                                    ->label('Comentários')
+                                                    ->placeholder('Adicione seus comentários...')
+                                                    ->required(),
+                                            ])
+                                            ->icon('heroicon-m-pencil-square')
+                                            ->action(function (array $data) {
+                                                $idBudget = $this->budgetId;
+                                                $budget = Budget::find($idBudget);
 
-                                        ->action(function ($record) {
-                                            $this->dispatch('clipboard:copied', $record->customer->document);
-                                        })
-                                ),
+                                                if ($budget) {
+                                                    $budget->statusHistories()->create([
+                                                        'status' => $data['status_id'],
+                                                        'comments' => $data['comments'],
+                                                        'changed_by' => auth()->id(),
+                                                        'budget_id' => $idBudget,
+                                                    ]);
+                                                } else {
+                                                    dd('Budget não encontrado');
+                                                }
+                                            })
+                                            ->modalHeading('Alterar Status')
+                                    )
+                                    ->extraAttributes(function ($record) {
+                                        $status = $record->latestStatus ? $record->latestStatus->status : 'STATUS_UNKNOWN';
+                                        $statusColor = $this->getStatusColor($status);
+                                        return ['class' => "$statusColor py-2 px-3 rounded-md"];
+                                    })
+                                    ->color('white'),
 
-                            TextEntry::make('customer.email')
-                                ->label('Correo Eletronico:')
-                                ->suffixAction(
-                                    Action::make('copiar')
-                                        ->icon('heroicon-m-clipboard')
-
-                                        ->action(function ($record) {
-                                            $this->dispatch('clipboard:copied', $record->customer->email);
-                                        })
-                                )
-                                ->extraAttributes(['class' => 'border-b']),
-                            TextEntry::make('customer.phone')
-                                ->label('Teléfono:')
-                                ->suffixAction(
-                                    Action::make('copiar')
-                                        ->icon('heroicon-m-clipboard')
-
-                                        ->action(function ($record) {
-                                            $this->dispatch('clipboard:copied', $record->customer->phone);
-                                        })
-                                )
-                                ->extraAttributes(['class' => 'border-b']),
-                            TextEntry::make('customer.address')
-                                ->label('Direccion:')
-                                ->suffixAction(
-                                    Action::make('copiar')
-                                        ->icon('heroicon-m-clipboard')
-
-                                        ->action(function ($record) {
-                                            $this->dispatch('clipboard:copied', $record->customer->address);
-                                        })
-                                )
-                                ->extraAttributes(['class' => 'border-b'])
-                                ->columnSpan(2),
-                        ])
-                        ->extraAttributes(['class' => 'bg-white p-4 dark:bg-gray-900 dark:text-white border'])
-                        ->columnSpan(2), // Coluna 1 do Grid
-
-                    // Segunda Coluna: Status
-                    Fieldset::make('Status')
-                        ->schema([
-                            TextEntry::make('status')
-                                ->label('Status')
-
-                                ->getStateUsing(function ($record) {
-                                    if ($record->latestStatus) {
-                                        $statusOptions = StatusHistory::getStatusOptions();
-                                        return $statusOptions[$record->latestStatus->status] ?? 'Status desconhecido';
-                                    }
-                                    return 'Status desconhecido';
-                                })
-                                ->suffixAction(
-                                    Action::make('alterarStatus')
-                                        ->form([
-                                            Select::make('status_id')
-                                                ->label('Novo Status')
-                                                ->options(StatusHistory::getStatusOptions())
-                                                ->required(),
-                                            Textarea::make('comments')
-                                                ->label('Comentários')
-                                                ->placeholder('Adicione seus comentários...')
-                                                ->required(),
-                                        ])
-                                        ->icon('heroicon-m-pencil-square')
-                                        ->action(function (array $data) {
-                                            $idBudget = $this->budgetId;
-                                            $budget = Budget::find($idBudget);
-
-                                            if ($budget) {
-                                                $budget->statusHistories()->create([
-                                                    'status' => $data['status_id'],
-                                                    'comments' => $data['comments'],
-                                                    'changed_by' => auth()->id(),
-                                                    'budget_id' => $idBudget,
-                                                ]);
-                                            } else {
-                                                dd('Budget não encontrado');
-                                            }
-                                        })
-                                        ->modalHeading('Alterar Status')
-                                )
-                                ->extraAttributes(function ($record) {
-                                    $status = $record->latestStatus ? $record->latestStatus->status : 'STATUS_UNKNOWN';
-                                    $statusColor = $this->getStatusColor($status);
-                                    return ['class' => "$statusColor py-2 px-3 rounded-md"];
-                                })
-                                ->color('white')
-                                ->columnSpan(2),
-
-                            TextEntry::make('latestStatus.created_at')
-                                ->label('Fecha:')
-                                ->formatStateUsing(fn($state) => \Carbon\Carbon::parse($state)->format('d/m/y - H:i:s'))
-                                ->columnSpan(2),
-                            TextEntry::make('latestStatus.comments')
-                                ->label('Comentarios:')
-                                ->extraAttributes(['class' => 'bg-danger-500 text-white'])
-                                ->columnSpan(2),
-                        ])
-                        ->extraAttributes(['class' => 'bg-white p-2 dark:bg-gray-900 dark:text-white'])
-                        ->columnSpan(1), // Coluna 2 do Grid
-                ]),
+                                TextEntry::make('latestStatus.created_at')
+                                    ->label('Fecha:')
+                                    ->formatStateUsing(fn($state) => \Carbon\Carbon::parse($state)->format('d/m/y - H:i:s'))
+                                    ->columnSpan(2),
+                                TextEntry::make('latestStatus.comments')
+                                    ->label('Comentarios:')
+                                    ->columnSpanFull()
+                                    ->extraAttributes(['class' => 'bg-danger-500 text-white'])
+                                ,
+                            ])
+                            ->extraAttributes(['class' => 'bg-white p-2 dark:bg-gray-900 dark:text-white'])
+                            ->columnSpan(1), // Coluna 2 do Grid
+                    ]),
             ]);
     }
 
@@ -332,26 +321,26 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
                 TextColumn::make('quantity')->label(__('Cant'))
                     ->hidden(fn() => !$this->visibleColumns['qtd'])
-                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
+                    ->color(fn($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
                 TextColumn::make('price')->label(__('Unid Precio'))->money('EUR')
                     ->hidden(fn() => !$this->visibleColumns['price'])
-                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
+                    ->color(fn($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
                 TextColumn::make('tax')->label('Iva %')
                     ->hidden(fn() => !$this->visibleColumns['tax'])
-                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
+                    ->color(fn($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
                 TextColumn::make('total')->label('Valor s/Iva')->money('EUR')
                     ->hidden(fn() => !$this->visibleColumns['total'])
-                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
+                    ->color(fn($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
                 TextColumn::make('total_tax')->label('Valor c/Iva')->money('EUR')
                     ->hidden(fn() => !$this->visibleColumns['total_tax'])
-                    ->color(fn ($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
+                    ->color(fn($record) => $record->total == 0 && $record->total_tax == 0 && $record->quantity == 0 ? 'text-gray-200' : null),
 
             ])
-            ->recordClasses(fn ($record) => ($record->total == 0 && $record->total_tax == 0 && $record->quantity == 0) ? 'bg-gray-200 text-gray-200 ' : '')
+            ->recordClasses(fn($record) => ($record->total == 0 && $record->total_tax == 0 && $record->quantity == 0) ? 'bg-gray-200 text-gray-200 ' : '')
             ->reorderable('sort_order') // Ativa o recurso de arrastar e soltar
             ->filters([
                 //
@@ -361,7 +350,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                 CreateAction::make()
                     ->model(BudgetItem::class)
                     ->form([
-                        Grid::make(4)
+                        Grid::make()
+                            ->columns([
+                                'md' => 4,
+                            ])
                             ->schema([
                                 Hidden::make('budget_id')
                                     ->default(fn() => $this->budgetId) // Defina uma função para obter o `budget_id` atual
@@ -374,7 +366,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-
                                     ->afterStateUpdated(function (callable $set, $state) {
                                         $product = Product::find($state);
                                         if ($product) {
@@ -385,8 +376,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                             $tax = (int)$product->tax / 100;
                                             $set('total_tax', $product->price + ($product->price * $tax));
                                         }
-                                    })
-                                    ->columns(1),
+                                    }),
 
                                 TextInput::make('quantity')
                                     ->label(__('Quantity'))
@@ -442,23 +432,24 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         $total = $get('total');
                                         $tax = (int)$state / 100;
                                         $set('total_tax', $total + ($total * $tax));
-                                    })
-                                    ->columns(1),
+                                    }),
 
                                 RichEditor::make('description')
                                     ->translateLabel()
                                     ->reactive()
-                                    ->columnSpan(4),
+                                    ->columnSpan([
+                                        'md' => 4
+                                    ]),
 
                                 TextInput::make('total')
                                     ->translateLabel()
-                                    ->default( '0.00')
+                                    ->default('0.00')
                                     ->readOnly(),
 
                                 TextInput::make('total_tax')
                                     ->label('Total Tax')
                                     ->translateLabel()
-                                    ->default( '0.00')
+                                    ->default('0.00')
                                     ->readOnly(),
                             ])
                     ])
@@ -472,7 +463,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                 EditAction::make()
                     ->model(BudgetItem::class)
                     ->form([
-                        Grid::make(4)
+                        Grid::make()
+                            ->columns([
+                                'md' => 4,
+                            ])
                             ->schema([
                                 Hidden::make('budget_id')
                                     ->default(fn() => $this->budgetId) // Defina uma função para obter o `budget_id` atual
@@ -485,8 +479,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->required()
                                     ->reactive()
                                     ->searchable()
-                                    ->preload()
-                                    ->columns(1),
+                                    ->preload(),
 
                                 TextInput::make('quantity')
                                     ->translateLabel()
@@ -534,7 +527,9 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 RichEditor::make('description')
                                     ->translateLabel()
                                     ->reactive()
-                                    ->columnSpan(4),
+                                    ->columnSpan([
+                                        'md' => 4
+                                    ]),
 
                                 TextInput::make('total')
                                     ->label('Total s/Iva')
@@ -565,6 +560,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                 ]),
             ]);
     }
+
     public function updateBudgetTotal()
     {
         $budget = Budget::find($this->budgetId);
@@ -602,7 +598,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 TextEntry::make('description')
                                     ->markdown()
                                     ->label('Observation')
-                                ->translateLabel()
+                                    ->translateLabel()
                             ])->columnSpan(1),
 
                         Section::make()

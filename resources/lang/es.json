@@ -267,8 +267,6 @@
     "Tool category" : "Categoria de Herramienta",
     "Title" : "Titulo",
     "Logo impress": "Logo de Impresion",
-    "Postal code" : "Código Postal",
-    "Send email" : "Correio de envio",
     "Dashboard": "Escritorio",
     "Invoice": "Factura",
     "Quantity": "Cantidad",
@@ -287,7 +285,8 @@
     "New Tool" : "Nueva Herramienta",
     "New Category Tool" : "Nueva Categoria de Herramienta",
     "New Service Provider" : "Nuevo Prestador de Servicio",
-    "New Supplier" : "Nuevo Fornecedor"
+    "New Supplier" : "Nuevo Fornecedor",
+    "Email Send" : "Correo de Envio"
 
 
 }

@@ -13,7 +13,7 @@
     <fieldset class="dark:border-gray-900 dark:bg-gray-900 p-4 rounded-lg mt-6 border bg-white">
         <legend class="text-lg font-semibold text-gray-800 dark:text-white">Campos del presupuesto:</legend>
 
-        <div class="flex gap-x-4"> <!-- Ajuste de gap-x para o espaçamento entre os itens -->
+        <div class="md:flex gap-x-4"> <!-- Ajuste de gap-x para o espaçamento entre os itens -->
             <label class="flex items-center gap-x-2">
                 <x-filament::input.checkbox wire:model="service" wire:change="updateVisibleColumns" :checked="$service"/>
                 <span>Servicio</span>

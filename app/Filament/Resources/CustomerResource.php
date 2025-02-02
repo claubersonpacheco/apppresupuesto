@@ -7,6 +7,7 @@ use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Filament\Resources\Customer\ExpensesResource\RelationManagers\ExpensesRelationManager;
 use App\Models\Customer;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -29,31 +30,38 @@ class CustomerResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('code')
-                    ->translateLabel()
-                    ->required()
-                    ->disabled()
-                    ->maxLength(20),
-                Forms\Components\TextInput::make('name')
-                    ->translateLabel()
-                    ->required()
-                    ->maxLength(100)
-                    ->columnSpan(2),
-                Forms\Components\TextInput::make('email')
-                    ->translateLabel()
-                    ->required()
-                    ->email()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('phone')
-                    ->translateLabel()
-                    ->required()
-                    ->maxLength(15),
-                Forms\Components\TextInput::make('document')
-                    ->translateLabel(),
-                Forms\Components\TextInput::make('address')
-                    ->translateLabel()
-                    ->required()
-                    ->maxLength(100),
+                Grid::make([
+                    'default' => 1,
+                    'md' => 3
+                ])->schema([
+                    Forms\Components\TextInput::make('code')
+                        ->translateLabel()
+                        ->required()
+                        ->disabled()
+                        ->maxLength(20),
+                    Forms\Components\TextInput::make('name')
+                        ->translateLabel()
+                        ->required()
+                        ->maxLength(100)
+                        ->columnSpanFull(),
+                    Forms\Components\TextInput::make('email')
+                        ->translateLabel()
+                        ->required()
+                        ->email()
+                        ->maxLength(100),
+                    Forms\Components\TextInput::make('phone')
+                        ->translateLabel()
+                        ->required()
+                        ->maxLength(15),
+                    Forms\Components\TextInput::make('document')
+                        ->translateLabel(),
+                    Forms\Components\TextInput::make('address')
+                        ->translateLabel()
+                        ->required()
+                        ->maxLength(100)
+                        ->columnSpanFull(),
+
+                    ])
             ]);
     }
 

@@ -5,11 +5,13 @@ namespace App\Filament\Resources\BudgetResource\Pages;
 use App\Filament\Resources\BudgetResource;
 use App\Models\Budget;
 use App\Traits\GeneratesAutomaticCode;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Auth;
 
 class CreateBudget extends CreateRecord
 {
@@ -21,6 +23,9 @@ class CreateBudget extends CreateRecord
 
         return $form
             ->schema([
+                Hidden::make('user_id')
+                    ->default(fn() => Auth::user()->id) // Defina uma função para obter o `budget_id` atual
+                    ->required(),
                 TextInput::make('code')
                     ->label('Código')
                     ->required()

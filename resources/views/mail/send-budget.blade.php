@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $data['title'] }}</title>
+    <title>{{ $data['title'] }} - {{ $data['subject'] }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,7 +46,9 @@
     @endif
 </div>
 <div class="content">
-    <p style="font-size: 14px; color: #555;">Este é um exemplo de email simples criado com HTML5. Lembre-se que emails reais devem ser testados em diferentes sistemas para garantir a entrega correta.</p>
+    <p style="font-size: 14px; color: #555;">#{{ $data['code'] }} - {{ $data['subject'] }}</p>
+    <p style="font-size: 14px; color: #555;">Hola, {{ $data['name'] }}</p>
+    {!! $data['message'] !!}
     <p style="font-size: 14px; color: #555;">Saludos Cordiales,<br>{{ $data['title'] }}</p>
     <p style="font-size: 14px; color: #555;">Email: {{ $data['email'] }}<br>WhatsApp: {{ $data['whatsapp'] }}</p>
 </div>

@@ -39,6 +39,11 @@ class Budget extends Model
         return $this->hasMany(BudgetItem::class);
     }
 
+    public function budgetsendemail():HasMany
+    {
+        return $this->hasMany(BudgetEmailSend::class);
+    }
+
     protected static function booted()
     {
         static::created(function ($budget) {
