@@ -380,7 +380,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
                                 TextInput::make('quantity')
                                     ->label(__('Quantity'))
-                                    ->numeric()
                                     ->rules('numeric')
                                     ->required()
                                     ->reactive()
@@ -394,11 +393,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     }),
 
                                 TextInput::make('price')
-                                    ->label('Price Unit')
+                                    ->label('Price')
                                     ->translateLabel()
-                                    ->rules('numeric')
+                                    ->rules('regex:/^\d+(\.\d{1,2})?$/')
                                     ->required()
-                                    ->numeric()
                                     ->reactive()
                                     ->default(fn($get) => $get('product_id') ? Product::find($get('product_id'))->price : '0.00')
                                     ->afterStateHydrated(function (callable $set, $state, $get) {
@@ -410,12 +408,16 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                         }
                                     })
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
+                                        $price = (float) $state; // Garante que o valor seja numérico
+                                        $quantity = (float) $get('quantity'); // Garante que a quantidade seja numérica
+                                        $total = $price * $quantity;
 
-                                        $total = $state * $get('quantity');
                                         $set('total', $total);
-                                        $tax = (int)$get('tax') / 100;
+
+                                        $tax = ((float) $get('tax')) / 100; // Converte o imposto para decimal
                                         $set('total_tax', $total + ($total * $tax));
                                     }),
+
 
                                 Select::make('tax')
                                     ->label('IVA')
@@ -483,14 +485,12 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
 
                                 TextInput::make('quantity')
                                     ->translateLabel()
-                                    ->numeric()
                                     ->required()
                                     ->reactive()
-                                    ->lazy(0.5)
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
                                         $total = $get('price') * $state; // Atualizando 'total' com base na 'price' e 'quantity'
                                         $set('total', $total); // Setando o valor no campo 'total'
-                                        $tax = (int)$get('tax') / 100;
+                                        $tax = ((float) $get('tax')) / 100;
                                         $set('total_tax', $total + ($total * $tax)); // Calculando o 'total_tax'
 
                                     }),
@@ -498,12 +498,15 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 TextInput::make('price')
                                     ->translateLabel()
                                     ->required()
-                                    ->numeric()
+                                    ->rules('regex:/^\d+(\.\d{1,2})?$/')
                                     ->reactive()
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
-                                        $total = $state * $get('quantity');
+                                        $price = (float) $state; // Garante que o valor seja numérico
+                                        $quantity = (float) $get('quantity'); // Garante que a quantidade seja numérica
+
+                                        $total = $price * $quantity;
                                         $set('total', $total);
-                                        $tax = (int)$get('tax') / 100;
+                                        $tax = ((float) $get('tax')) / 100;
                                         $set('total_tax', $total + ($total * $tax));
 
                                     }),

@@ -22,7 +22,7 @@ class BudgetRelationManager extends RelationManager
 
         return $form
             ->schema([
-
+                
                 TextInput::make('subject')
                     ->label('Subject')
                     ->translateLabel()
