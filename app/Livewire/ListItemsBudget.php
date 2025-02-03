@@ -346,7 +346,6 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                 //
             ])
             ->headerActions([
-
                 CreateAction::make()
                     ->model(BudgetItem::class)
                     ->form([
@@ -383,6 +382,7 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->rules('numeric')
                                     ->required()
                                     ->reactive()
+                                    ->debounce(500)
                                     ->default('0')
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
                                         if (!$get('product_id')) return;
@@ -395,9 +395,10 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 TextInput::make('price')
                                     ->label('Price')
                                     ->translateLabel()
-                                    ->rules('regex:/^\d+(\.\d{1,2})?$/')
+                                    ->rules('numeric|regex:/^\d+(\.\d{1,2})?$/')
                                     ->required()
                                     ->reactive()
+                                    ->debounce(500)
                                     ->default(fn($get) => $get('product_id') ? Product::find($get('product_id'))->price : '0.00')
                                     ->afterStateHydrated(function (callable $set, $state, $get) {
                                         if ($get('product_id')) {
@@ -482,11 +483,12 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                     ->reactive()
                                     ->searchable()
                                     ->preload(),
-
                                 TextInput::make('quantity')
                                     ->translateLabel()
                                     ->required()
+                                    ->rules('numeric')
                                     ->reactive()
+                                    ->debounce(500)
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
                                         $total = $get('price') * $state; // Atualizando 'total' com base na 'price' e 'quantity'
                                         $set('total', $total); // Setando o valor no campo 'total'
@@ -498,8 +500,9 @@ class ListItemsBudget extends Component implements HasTable, HasForms, HasInfoli
                                 TextInput::make('price')
                                     ->translateLabel()
                                     ->required()
-                                    ->rules('regex:/^\d+(\.\d{1,2})?$/')
+                                    ->rules('numeric|regex:/^\d+(\.\d{1,2})?$/')
                                     ->reactive()
+                                    ->debounce(500)
                                     ->afterStateUpdated(function (callable $set, $state, $get) {
                                         $price = (float) $state; // Garante que o valor seja numérico
                                         $quantity = (float) $get('quantity'); // Garante que a quantidade seja numérica
