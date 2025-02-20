@@ -10,10 +10,11 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    && \
-    docker-php-ext-install intl zip \
-    && docker-php-ext-configure gd \
-    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql bcmath
+    libzip-dev \
+    libicu-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql bcmath intl zip
+
 
 # Instala o Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
