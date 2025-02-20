@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    intl \
+    zip\
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
@@ -21,9 +23,6 @@ WORKDIR /var/www/html
 
 # Copia os arquivos da aplicação
 COPY . .
-
-# Instala as extensões ausentes
-RUN docker-php-ext-install intl zip
 
 # Instala as dependências do Laravel
 RUN composer install --no-dev --optimize-autoloader
