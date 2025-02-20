@@ -1,38 +1,38 @@
-FROM laravelsail/php83-composer
+# Usa a imagem oficial do PHP com extensões necessárias
+FROM php:8.2-fpm
 
-# Instale o sudo
-RUN apt-get update && apt-get install -y sudo
-
-# Instale as dependências necessárias para o Puppeteer e Chromium
-RUN apt-get install -y \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libxcomposite1 \
-    libxrandr2 \
-    libxdamage1 \
-    libgbm-dev \
-    libpango-1.0-0 \
-    libasound2 \
-    libxshmfence1 \
-    wget \
+# Instala pacotes necessários
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    unzip \
+    git \
     curl \
-    chromium
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-configure gd \
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql bcmath
 
-# Instale o Node.js 20.x e npm
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs
+# Instala o Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copie o package.json e package-lock.json para o contêiner
+# Define o diretório de trabalho
 WORKDIR /var/www/html
-COPY package.json package-lock.json /var/www/html/
 
-# Instale as dependências do npm (incluindo o Puppeteer)
-RUN npm install
+# Copia os arquivos da aplicação
+COPY . .
 
-# Outras configurações do Dockerfile conforme necessário
-# ...
+# Instala as dependências do Laravel
+RUN composer install --no-dev --optimize-autoloader
 
-# Exponha a porta necessária
+# Gera a chave da aplicação
+RUN php artisan key:generate
+
+# Define permissões para storage e cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Define a porta que o container vai expor
 EXPOSE 9000
+
+# Comando para rodar o PHP-FPM
+CMD ["php-fpm"]

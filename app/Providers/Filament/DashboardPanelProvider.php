@@ -2,10 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Models\Tenant;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
+use Filament\Pages\Tenancy\RegisterTenant;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -85,11 +87,14 @@ class DashboardPanelProvider extends PanelProvider
                 }
 
                 // Em produção, usa o arquivo de manifesto
-                return Vite::useManifestFile(public_path('build/.vite/manifest.json'))
+                return Vite::useManifestFilename(public_path('build/manifest.json'))
                     ->useBuildDirectory('build/')
                     ->withEntryPoints(['resources/js/app.js', 'resources/css/app.css'])
                     ->toHtml();
-            });
+            })
+            ->tenant(Tenant::class)
+            ->tenantRegistration(RegisterTenant::class)
+            ->registration();
     }
 
 
