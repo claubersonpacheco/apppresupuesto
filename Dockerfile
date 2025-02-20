@@ -7,11 +7,11 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    intl \
-    zip\
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    && \
+    docker-php-ext-install intl zip \
     && docker-php-ext-configure gd \
     && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql bcmath
 
